@@ -1,4 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
 <title>遅い</title>
 <meta charset="UTF-8">
 <link rel=icon
     href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="1.1em" font-size="75">🐌️</text></svg>'>
+</head>
+<style>
+    body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 80px auto;
+        padding: 0 20px;
+        background-color: #edd4b2;
+    }
+    p {
+        color: #4e352e;
+        font-size: x-large;
+        line-break: anywhere;
+    }
+</style>
+<body>
+
+<p>osoi is loading</p>
+
+<script id="main">
+const p = document.querySelector("p")
+setInterval(() => {
+    p.innerText += p.innerText.endsWith(".") ? "." : " ."
+}, 1000)
+</script>
+
+</body>
+</html>
