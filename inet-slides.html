@@ -1,0 +1,1334 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>inet slides</title>
+<meta charset="UTF-8">
+<link rel=icon href='data:image/svg+xml,
+    <svg xmlns=%22http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <text y="1.1em" font-size="75">🐌️</text></svg>'>
+</head>
+<body style="margin: 0; overflow: hidden;
+    background-color: #eef1e5">
+<canvas id="2d_canvas" style="position: absolute; top: 0">
+</canvas>
+
+<script type="slides">
+
+Interaction Nets and Cellular Automata
+
+Troy Kidd
+
+
+# Sequential Computation
+
+Turing machines model one computational action, at one location, per time step.
+
+Multi-tape Turing machines model a finite number of computations per step, either at multiple locations or with moving tapes.
+
+These can do some computations in quadratically less steps than an equivalent standard Turing machine,
+
+but they still compute with one centralized transition function, and constant time computation involving indefinitely far sites is physically unrealistic.
+
+#diagram turing machine { x: 990, y: 190, w: 430, h: 135 }
+
+#diagram multi tape turing machine {
+    y: 490, h: 290,
+}
+
+
+# Parallel Computation
+
+Interaction nets were developed by Yves Lafont in 1990, as a practical model for parallel programming.
+
+In this model, information is represented with a collection of cells and ports, connected by wires.
+
+During one computational step, if a pair of cells matches a rule, they are replaced in a way that doesn’t leave disconnected wires.
+
+Many replacements can occur in parallel and can be repeated until there are no rule matches (in the case of a terminating computation).
+
+#diagram
+interaction net { x: 960, y: 290, w: 360, h: 300 }
+
+
+# Interaction Nets
+
+Definition 1.  An interaction net is a finite set of labelled cells (each having some number of ports), a set of free ports not associated with any cells, and a set of wires, connecting each port to another one.
+
+Cells have one principal port and 𝑛≥0 auxiliary ports (numbered in clockwise order), where 𝑛 is the arity of the cell’s symbol.
+
+Wires may connect ports of the same cell or exist as a cyclic wire not connecting any ports.
+
+#diagram interaction net {}
+
+
+# Interaction Rules
+
+Definition 2.  An interaction rule is a pair of interaction nets having the same set of free ports.
+
+The left-side net must consist of two cells with a wire between their principal ports, and a wire between each free port and an auxiliary port.
+
+Rules may have more than two cells on the right, allowing for an exponentially increasing number of computations per step.
+
+#diagram interaction rules { x: 1030, y: 200, w: 340, h: 450 }
+
+
+# Reductions
+
+Definition 3.  A reduction (step) replaces a cell pair matching the left side of a rule with the right-side net.
+After identifying an active cell pair, all auxiliary ports are temporarily treated as being wired to corresponding free ports.
+
+Assume that we only use rule sets that can be applied unambiguously – at most one rule per unordered pair of cell symbols, and with order being irrelevant for pairs with the same symbol.
+
+An unambiguous rule set is called an interaction system.
+
+#diagram reduction { x: 920, y: 240, w: 580, h: 360 }
+
+
+# Reductions
+
+#diagram hoc logo { x: 430, y: 260, w: 710, h: 400 }
+
+
+# Confluence
+
+Theorem 1. (strong confluence)  If an interaction net 𝑁 reduces to either 𝑃 or 𝑄 in one step, with 𝑃≠𝑄, then 𝑃 and 𝑄 can both reduce in one step to a common net 𝑅.
+
+Proof.  Let {𝑐_1, 𝑐_2 } be the cells involved in reduction of 𝑁 to 𝑃, and let {𝑐_3, 𝑐_4 } be the same for 𝑄.
+
+Since reductions apply only to cell pairs connected by their principal ports, and 𝑃≠𝑄, then {𝑐_1, 𝑐_2 }∩{𝑐_3, 𝑐_4 }=∅.
+
+Therefore, {𝑐_3, 𝑐_4 } would remain reducible after reducing {𝑐_1, 𝑐_2 } and vice versa, so 𝑅 is the net with both reductions applied.				     ∎
+
+#diagram confluence { x: 940, y: 60, w: 640, h: 800 }
+
+
+# Confluence
+
+“Strong confluence” commonly refers only to the property that branching reduction sequences can always result in the same element.
+
+It guarantees that two diverging and terminating reduction sequences have the same result.
+
+The version here with single step reductions additionally guarantees that both sequences have the same length. This is sometimes referred to as the diamond property.
+
+#diagram confluence {}
+
+#diagram diamond { x: 390, y: 700, w: 140, h: 150 }
+
+
+# Expression Evaluation
+
+#text { w: 660 }
+
+Example 1.  Unary addition.
+
+Cells 0, 𝑠 (successor), and +, along with two interaction rules can be used reduce an addition expression to a normal form.
+
+From the diamond property, all possible reductions to an irreducible form reach the same form, with the same number of reduction steps.
+
+In this example, an irreducible form is reached in 4 steps, with both rules being applied twice, possibly in only 2 parallel reduction passes.
+
+#diagram unary addition { x: 790, y: 120, w: 780, h: 710 }
+
+
+# Expression Evaluation
+
+(r to reset)
+
+
+#
+
+#diagram reduction paths { x: 150, y: 70, w: 1250, h: 710 }
+
+
+# Turing Completeness
+
+#text reset
+
+Example 2.  Implementation of Turing machines.
+
+A Turing machine is formally specified with the 7-tuple M=(Q,Γ,b,Σ,𝛿,𝑞_0,𝐹), where:
+
+𝑄 is a set of states the machine can be in,
+Γ is a set of symbols that can be stored on a tape,
+𝑏∈Γ is the blank symbol (default if not specified),
+Σ⊆Γ∖\{𝑏\} is a set of valid input tape symbols,
+𝛿 :(𝑄∖𝐹)×Γ→𝑄×Γ×\{𝐿, 𝑅\} is a transition function,
+𝑞_0∈𝑄 is the initial state of the machine,
+and 𝐹⊆𝑄 is a set of final states.
+
+#diagram turing machine step { x: 1000, y: 290, w: 420, h: 320 }
+
+
+# Turing Completeness
+
+Example 2 (cont’d).  Implementation of Turing machines.
+
+The primary elements are 𝑄 (states), Γ (symbols), and 𝛿 (transition function). The rest are subsets or elements of these that denote valid initial and final conditions.
+
+Let …,𝑎_(−2), 𝑎_(−1), 𝑎_0, 𝑎_1,𝑎_2,… denote the sequence of tape symbols. The read/write head starts at position 0 and in state 𝑞_0.
+
+If 𝛿(𝑞, 𝑎)=(𝑞^′,𝑎^′,𝐿), with (𝑞_0, a_0)=(𝑞,𝑎), then in the next configuration, we have 𝑎_0=𝑎^′ with the head at position −1 and in state 𝑞^′.
+
+#diagram turing machine step {}
+
+
+# Turing Completeness
+
+Example 2 (cont’d).  Implementation of Turing machines.
+
+We can represent this configuration and transition with the nets in Figure 7.
+
+We orient the initial cells, and define interaction rules, so that there is exactly one active pair at each step.
+
+#diagram inet tm implementation { x: 900, y: 50, w: 590, h: 680 }
+
+
+# Turing Completeness
+
+Example 2 (cont’d).  Implementation of Turing machines.
+
+If we instead initialize with 𝑎_0 and 𝑎_1 connected, the equivalent rule for 𝛿(𝑞, 𝑎)=(𝑞^′,𝑎^′,𝐿) is different – with 𝑞 changing 𝑎_0 and turning around, instead of passing through.
+
+Since the rule depends on the last direction, we double the size of 𝑄, so that a state 𝑞 is represented with either 𝑞_𝐿 or 𝑞_𝑅 depending on the previous transition (or init).
+
+We can then match an appropriate interaction rule and include direction info in the next state (𝑞_𝐿^′).
+
+#diagram implementation with q0 coming from right {}
+
+
+# Turing Completeness
+
+Example 2 (cont’d).  Implementation of Turing machines.
+
+Since interaction nets are finite, both ends are terminated with cells that simulate interaction with a blank symbol and extend the tape.
+
+#diagram a tape-extending reduction
+{ x: 950, y: 130, w: 550, h: 520 }
+
+
+# Cellular Automata
+
+Typically, a cellular automaton (CA) is a regular network (line/grid/etc.) of cells with discrete states.
+
+Cells update simultaneously as a function of neighboring cells. Each cell replaces its state with 𝑓(𝑠_1, 𝑠_2, …)∈𝑆, where 𝑠_𝑖 are states of the cells in its neighborhood.
+
+A configuration describes the state of all cells at some point in time. It is considered to extend infinitely in all directions, and can be represented as a function 𝑐 :ℤ^𝑑  →𝑆.
+
+#diagram 1D and 2D CA steps { x: 1000, y: 170, w: 460, h: 490 }
+
+
+#
+
+#diagram glider gun, rule 90 { x: 120, y: 150, w: 1410, h: 530 }
+
+
+# Finitely Specifiable Configurations
+
+Finite configurations consist of a finite number of cells not in some state 𝑠∈𝑆, with all other cells being in state 𝑠.
+
+A configuration is periodic if it’s 𝑟 ⃗-periodic for at least one vector 𝑟 ⃗∈ℤ^𝑑, meaning the state of any cell 𝑛 ⃗ is the same as cell 𝑛 ⃗+𝑟 ⃗.
+
+A 𝑑-dimensional configuration is totally periodic if it’s 𝑟 ⃗_𝑖-periodic for 𝑑 linearly independent vectors (𝑟_𝑖 ) ⃗. For these, the configuration can be fully described by some finite region of cells.
+
+#diagram finite and periodic configs
+{ x: 920, y: 250, w: 610, h: 500 }
+
+
+# Cellular Automata
+
+Example 3.  Implementation of 1-dimensional CA.
+
+We can implement a CA computation step with two parallel reductions. Cells interact with their left then right neighbor, or vice versa.
+
+Since orientation is important here, we create a left and right-facing version of each state.
+
+We also add left and right-facing versions of each pair of original states (such as (𝑟𝑠) ̅), so reductions in the second pass can consider both neighbors.
+
+#diagram inet ca implementation { x: 930, y: 210, w: 540, h: 390 }
+
+
+# Cellular Automata
+
+#diagram example { x: 400, y: 190, w: 1110, h: 550 }
+
+
+# Cellular Automata
+
+Example 3 (cont’d).  Implementation of 1D CA.
+
+If we have a finite configuration (uniform state 𝑝 past some first and last cell), we can use a similar technique as before to allow the finite net to expand indefinitely.
+
+We can instead represent periodic configurations by attaching both ends together, if the period is even.
+
+#diagram config expanding reduction
+{ x: 860, y: 190, w: 610, h: 400 }
+
+#diagram periodic reduction { x: 240, y: 620, w: 400, h: 260 }
+
+
+# Cellular Automata
+
+#diagram example { x: 450, y: 210, w: 1060, h: 500 }
+
+
+# References
+
+#text {w: 1400}
+
+1.  Lafont, Y. Interaction Nets. In Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (1989) 95-108.
+
+2.  Lafont, Y. Interaction Combinators. Information and Computation, 137 no. 1 (1997), 69-101.
+
+</script>
+
+<script id="math">
+const pi = Math.PI
+const tau = 2 * pi
+const cos = Math.cos
+const sin = Math.sin
+const atan2 = Math.atan2
+const min = Math.min
+const max = Math.max
+const abs = Math.abs
+const floor = Math.floor
+const ceil = Math.ceil
+const round = Math.round
+const exp = Math.exp
+const log = Math.log
+const rand = Math.random
+
+const dist = (x1, y1, x2, y2) => Math.sqrt(
+    (x2 - x1)**2 + (y2 - y1)**2
+)
+const clamp = (x, a, b) => min(max(x, a), b)
+const lerp = (a, b, t) => a * (1 - t) + b * t
+
+function lerp_angle(a, b, t) {
+	const theta = b - a
+	if (theta > math.pi) {
+		a = a + tau
+    } else if (theta < -pi) {
+		a = a - tau
+    }
+	return lerp(a, b, t)
+}
+</script>
+
+<script id="main">
+const pres = {
+    w: 1600, h: 900, cy: 900 / 2
+}
+const lscy = parseFloat(localStorage.getItem("cy"))
+if (!isNaN(lscy)) { pres.cy = lscy }
+
+const style = {
+    heading: {
+        x: 100, y: 110, w: 800,
+        size: 50,
+        color: "#50b4c8",
+        textAlign: "left",
+        textBaseline: "top",
+    },
+    body: {
+        x: 100, y: 260, w: 750,
+        size: 30,
+        color: "#262626",
+        textAlign: "left",
+        textBaseline: "top",
+    },
+}
+style.diag = {
+    ...style.body,
+    textAlign: "center",
+    textBaseline: "middle",
+}
+
+const slides = parse_slides(
+    document.querySelector("[type=slides]").innerText
+)
+
+function parse_slides(src) {
+    const slides = []
+    let state = "title"
+    let [left, right] = [0, 0]
+
+    function read_line() {
+        // make [left, right) slice the next contentful line
+        while (src[left] === "\n") left++
+        right = left + 1
+        while (src[right] !== "\n") right++
+        const line = src.slice(left, right)
+        // move left to be past the line
+        left = right
+        return line
+    }
+
+    function read_header() {
+        const _left = left
+        const line = read_line()
+        if (line.startsWith("# ")) { return line.slice(2) }
+        if (line.trim() === "#") {
+            // slide without header
+            // - dont add text but keep parser state
+            return false
+        }
+
+        // reset if didnt read header
+        [left, right] = [_left, _left]
+        return false
+    }
+
+    function read_body() {
+        // find next header
+        while (
+            right < src.length
+            && !(
+                src.slice(right - 1, right + 2) === "\n# "
+                || src.slice(right - 1, right + 2) === "\n#\n"
+            )
+        ) { right++ }
+
+        const body = src.slice(left, right)
+        left = right
+        return body
+    }
+
+    function parse_kvs(kv_str) {
+        // convert "a: b, c: 1.23" to object
+        const kv_lines = kv_str.split(",")
+        const kvs = {}
+        for (const kv of kv_lines) {
+            if (kv.indexOf(":") === -1) continue
+
+            let [k, v] = kv.split(":", 2)
+            k = k.trim()
+            v = v.trim()
+            const flv = parseFloat(v)
+            if (isNaN(flv)) {
+                kvs[k] = v
+            } else {
+                kvs[k] = flv
+            }
+        }
+        return kvs
+    }
+
+    function parse_diagram(src, kvs) {
+        // example: "#diagram\n dg name {a: b, \n c:d,}"
+
+        // drop "#diagram " (or \n)
+        src = src.slice(9)
+        const diag = { texts: [], rects: [] }
+        // make sure it has braces
+        const p_start = src.indexOf("{")
+        if (p_start === -1 || !src.endsWith("}")) {
+            return [diag, kvs]
+        }
+
+        // get diag name, and drop it and the braces
+        const name = src.slice(0, p_start).trim()
+        src = src.slice(p_start + 1, -1)
+
+        // read key/val pairs, use numerical val if possible
+        for (const [k, v] of Object.entries(parse_kvs(src))) {
+            kvs[k] = v
+        }
+
+        // placeholder box
+        diag.rects.push({
+            color: "#000",
+            alpha: 0.1,
+            ...kvs
+        })
+        // text
+        diag.texts.push({
+            ...style.diag,
+            ...kvs,
+            x: kvs.x + kvs.w / 2,
+            y: kvs.y + kvs.h / 2,
+            val: name,
+        })
+
+        return [diag, kvs]
+    }
+
+    function parse_diagrams(body_in, kvs) {
+        const diagrams = { texts: [], rects: [] }
+        let body = body_in
+        while (true) {
+            let d_left = body.indexOf("#diagram")
+            if (d_left === -1) break
+            let d_right = d_left + 1
+            while (d_right < body.length && body[d_right] !== "}")
+            { d_right++ }
+            d_right++
+
+            let diag
+            [diag, kvs] = parse_diagram(
+                body.slice(d_left, d_right), kvs
+            )
+            diagrams.texts.push(...diag.texts)
+            diagrams.rects.push(...diag.rects)
+            body = body.slice(0, d_left) + body.slice(d_right) 
+        }
+
+        return [diagrams, body, kvs]
+    }
+
+    function parse_body(body_in, kvs) {
+        // apply "#text {k:v}" or "#text reset" commands
+        // to body styling
+
+        kvs.body = kvs.body || {}
+        let body = body_in.trim()
+        if (body.startsWith("#text reset")) {
+            kvs.body = {}
+            body = body.slice(11).trim()
+        } else if (body.startsWith("#text")) {
+            const p_start = body.indexOf("{")
+            const p_end = body.indexOf("}")
+            if (p_start === -1 || p_end === -1) {
+                return [body, kvs]
+            }
+
+            const body_kvs = parse_kvs(
+                body.slice(p_start + 1, p_end)
+            )
+            for (const [k, v] of Object.entries(body_kvs)) {
+                kvs.body[k] = v
+            }
+            body = body.slice(p_end + 1)
+        }
+        return [body, kvs]
+    }
+
+    function parse_slide(kvs) {
+        const slide = { texts: [], rects: [] }
+
+        const header = read_header()
+        if (header) {
+            slide.texts.push({
+                ...style.heading,
+                val: header,
+            })
+        }
+
+        let body = read_body()
+        let diagrams
+        [diagrams, body, kvs] = parse_diagrams(body, kvs)
+
+        // something is very broken here but doing it like this
+        // works on my machine
+        let _kvs
+        [body, _kvs] = parse_body(body, kvs)
+        kvs = _kvs
+
+        slide.texts.push({
+            ...style.body,
+            ...kvs.body,
+            val: body,
+        })
+        slide.texts.push(...diagrams.texts)
+        slide.rects.push(...diagrams.rects)
+
+        return [slide, kvs]
+    }
+
+    // add title and name
+    const title_slide = { texts: [], rects: [
+        { x: 0, y: 0, w: 108, h: 900, color: "#333b45" },
+        { x: 108, w: 612 - 108, color: "#4c5967" },
+        { x: 612, w: 1600 - 612, color: "#657689" },
+    ]}
+    title_slide.texts.push({
+        font: "sans-serif",
+        x: 700, y: 315, w: 550,
+        size: 60,
+        color: "#fff",
+        textAlign: "left",
+        textBaseline: "top",
+    })
+    title_slide.texts.push({ val: read_line() })
+    title_slide.texts.push({
+        y: 550,
+        size: 50,
+        color: "#c0c8d1",
+    })
+    title_slide.texts.push({ val: read_line() })
+    slides.push(title_slide)
+
+    // add rest of slides
+    let kvs = {}
+    while (left < src.length) {
+        let slide
+        [slide, kvs] = parse_slide(kvs)
+        slides.push(slide)
+    }
+
+    return slides
+}
+
+const canvas = document.getElementById("2d_canvas")
+const ctx = canvas.getContext("2d")
+
+const now = () => performance.now()
+const timing = {
+    paused: false,
+    zero: now(),
+    last_time: now(),
+    frame: 0,
+}
+
+onload = function() {
+    init()
+    loop()
+}
+
+function loop() {
+    fix_size()
+    const t = timing
+    t.dt = (now() - t.last_time) / 1000
+    t.last_time = now()
+
+    if (!t.paused) {
+        update(t.dt)
+    }
+    draw()
+
+    mouse.px = mouse.x
+    mouse.py = mouse.y
+    t.frame++
+    requestAnimationFrame(loop)
+}
+
+function update(dt) {
+    const [w, h] = [canvas.width, canvas.height]
+    const scale = min(w / pres.w, h / pres.h)
+
+    // only for slide 11 diagram
+    if (
+        11 * pres.h < pres.cy - h / 2 / scale
+        || 10 * pres.h > pres.cy + h / 2 / scale
+    ) { return }
+
+    // no big jumps if fps < 10
+    dt = min(dt, 0.1)
+
+    // influence cell velocities to shorten primary wires,
+    // apply rewrite if short enough
+    for (const edge of edges) {
+        // skip if not a primary port/port edge
+        if (
+            edge[0].type === "cell" 
+            || !(edge[0].label === 0 && edge[1].label == 0)
+        ) continue
+
+        // primary plus mouse close
+        let mx = (mouse.x - w / 2) / scale + pres.w / 2
+        let my = (mouse.y - h / 2) / scale + pres.cy - 10 * pres.h
+        const md = dist(
+            mx, my,
+            (edge[0].x + edge[1].x) / 2,
+            (edge[0].y + edge[1].y) / 2,
+        )
+        if (edge.is_primary && md < 200) {
+            let [c1, c2] = edge.cells
+            const dx = c2.x - c1.x
+            const dy = c2.y - c1.y
+            const accel = 20 * max((200 - md) / 200, 0)
+            c1.xv += dx * accel * dt
+            c1.yv += dy * accel * dt
+            c2.xv -= dx * accel * dt
+            c2.yv -= dy * accel * dt
+            
+            const d = dist(c1.x, c1.y, c2.x, c2.y)
+            if (d < 10) {
+                let rule_match = null
+                for (rule of rules) {
+                    if (
+                        c1.label === rule.match[0]
+                        && c2.label === rule.match[1]
+                        || c2.label === rule.match[0]
+                        && c1.label === rule.match[1] 
+                    ) {
+                        rule_match = rule
+                        break
+                    }
+                }
+                if (rule_match !== null) {
+                    // match order
+                    if (c1.label !== rule.match[0]) {
+                        [c1, c2] = [c2, c1]
+                    }
+
+                    // add aux ports to list
+                    const rule_ports = []
+                    for (let i = 1; i < c1.ports.length; i++) {
+                        rule_ports.push({port: c1.ports[i]})
+                    }
+                    for (let i = 1; i < c2.ports.length; i++) {
+                        rule_ports.push({port: c2.ports[i]})
+                    }
+
+                    // remove cells and primary wire
+                    for (let i = verts.length - 1; i >= 0; i--) {
+                        if (verts[i] === c1 || verts[i] === c2) {
+                            verts.splice(i, 1)
+                        }
+                    }
+                    for (let i = 0; i < edges.length; i++) {
+                        if (
+                            edges[i].cells && (
+                                edges[i].cells[0] === c1
+                                && edges[i].cells[1] === c2
+                                || edges[i].cells[1] === c1
+                                && edges[i].cells[0] === c2
+                            )
+                        ) {
+                            edges.splice(i, 1)
+                            break
+                        }
+                    }
+
+                    // add new cells and add ports to list
+                    const match_angle = atan2(
+                        c1.y - c2.y, c1.x - c2.x
+                    )
+                    const cx = (c1.x + c2.x) / 2
+                    const cy = (c1.y + c2.y) / 2
+                    for (const nc of rule.new_cells) {
+                        const a = match_angle + nc.angle
+                        const c = new_cell(
+                            nc.label,
+                            cx + cos(a) * nc.x - sin(a) * nc.y,
+                            cy + sin(a) * nc.x + cos(a) * nc.y,
+                            a,
+                        )
+                        for (let i = 0; i < c.ports.length; i++) {
+                            rule_ports.push({
+                                port: c.ports[i], cell: c
+                            })
+                        }
+                    }
+
+                    // add new wires
+                    for (const port_ids of rule.wires) {
+                        const rp1 = rule_ports[port_ids[0]]
+                        const rp2 = rule_ports[port_ids[1]]
+                        const new_wire = {
+                            0: rp1.port, 1: rp2.port, cells: []
+                        }
+                        if (rp1.cell) new_wire.cells.push(rp1.cell)
+                        if (rp2.cell) new_wire.cells.push(rp2.cell)
+                        if (
+                            new_wire.cells.length === 2
+                            && rp1.cell.ports[0] === rp1.port
+                            && rp2.cell.ports[0] === rp2.port
+                        ) {
+                            new_wire.is_primary = true
+                        }
+                        edges.push(new_wire)
+                    }
+                }
+            } 
+        }
+    }
+
+    // remove center port in (cell - port - port - port - cell) paths
+    // and possibly set wire as primary
+    for (let e_idx = edges.length - 1; e_idx >= 0; e_idx--) {
+        const edge = edges[e_idx]
+        const p1 = edge[0]
+        const p2 = edge[1]
+        if (!(p1.type === "port" && p2.type === "port")) continue
+
+        let p1_next = null
+        let p2_next = null
+        for (const edge2 of edges) {
+            if (edge2[0] === p1 && edge2[1] !== p2)
+                p1_next = edge2[1]
+            if (edge2[1] === p1 && edge2[0] !== p2)
+                p1_next = edge2[0]
+            if (edge2[0] === p2 && edge2[1] !== p1)
+                p2_next = edge2[1]
+            if (edge2[1] === p2 && edge2[0] !== p1)
+                p2_next = edge2[0]
+        }
+        if (!(p1_next && p2_next)) continue
+
+        if (p1_next.type === "cell" && p2_next.type === "port") {
+            // remove p2 and adjacent edges,
+            // then connect p1 and p2_next
+            for (let i = verts.length - 1; i >= 0; i--) {
+                if (verts[i] === p2) verts.splice(i, 1)
+            }
+            for (let i = edges.length - 1; i >= 0; i--) {
+                if (edges[i][0] === p2 || edges[i][1] === p2) {
+                    edges.splice(i, 1)
+                }
+            }
+            let p2_next_2 = null
+            for (const edge3 of edges) {
+                if (edge3[0] === p2_next && edge3[1] !== p2)
+                    p2_next_2 = edge3[1]
+                if (edge3[1] === p2_next && edge3[0] !== p2)
+                    p2_next_2 = edge3[0]
+            }
+
+            const new_wire = {
+                0: p1, 1: p2_next, cells: [p1_next]
+            }
+            if (p2_next_2 && p2_next_2.type === "cell") {
+                new_wire.cells.push(p2_next_2)
+            }
+            if (
+                new_wire.cells.length === 2
+                && p1_next.ports[0] === p1
+                && p2_next_2.ports[0] === p2_next
+            ) {
+                new_wire.is_primary = true
+            }
+            edges.push(new_wire)
+        }
+        // do it all over again but if p2_next is cell
+        if (p1_next.type === "port" && p2_next.type === "cell") {
+            // remove p1 and adjacent edges,
+            // then connect p1_next and p2
+            for (let i = verts.length - 1; i >= 0; i--) {
+                if (verts[i] === p1) verts.splice(i, 1)
+            }
+            for (let i = edges.length - 1; i >= 0; i--) {
+                if (edges[i][0] === p1 || edges[i][1] === p1) {
+                    edges.splice(i, 1)
+                }
+            }
+            let p1_next_2 = null
+            for (const edge3 of edges) {
+                if (edge3[0] === p1_next && edge3[1] !== p1)
+                    p1_next_2 = edge3[1]
+                if (edge3[1] === p1_next && edge3[0] !== p1)
+                    p1_next_2 = edge3[0]
+            }
+
+            const new_wire = {
+                0: p1_next, 1: p2, cells: [p2_next]
+            }
+            if (p1_next_2 && p1_next_2.type === "cell") {
+                new_wire.cells.push(p1_next_2)
+            }
+            if (
+                new_wire.cells.length === 2
+                && p1_next_2.ports[0] === p1_next
+                && p2_next.ports[0] === p2
+            ) {
+                new_wire.is_primary = true
+            }
+            edges.push(new_wire)
+        }
+    }
+
+    // update cells
+    for (const vert of verts) {
+        if (vert.type === "cell") update_cell(vert, dt)
+    }
+}
+
+function draw() {
+    ctx.resetTransform()
+    const [w, h] = [canvas.width, canvas.height]
+    ctx.clearRect(0, 0, w, h)
+
+    // line style
+    ctx.strokeStyle = "#000"
+    ctx.lineCap = "round"
+    ctx.lineJoin = "round"
+    ctx.lineWidth = 2
+
+    // set transform for slide
+    const scale = min(w / pres.w, h / pres.h)
+    ctx.translate(w / 2, h / 2)
+    ctx.scale(scale, scale)
+    ctx.translate(-pres.w / 2, -pres.cy)
+    let slide_mat = ctx.getTransform()
+
+    // text
+    let text = {}
+    let rect = {}
+    for (let slide_i = 0; slide_i < slides.length; slide_i++) {
+        const slide = slides[slide_i]
+        // alternate slight background dimming on/off
+        // todo: better solution for visually separating slides
+        if (slide_i % 2 === 1) {
+            ctx.fillStyle = "#000"
+            ctx.globalAlpha = 0.03
+            ctx.fillRect(0, 0, pres.w, pres.h)
+            ctx.globalAlpha = 1
+        }
+
+        for (const slide_rect of slide.rects || []) {
+            rect = {...rect, ...slide_rect}
+            ctx.fillStyle = rect.color
+            if (rect.alpha !== undefined) {
+                ctx.globalAlpha = rect.alpha
+            }
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+            ctx.globalAlpha = 1
+        }
+
+        for (const slide_text of slide.texts || []) {
+            // update params
+            text = {...text, ...slide_text}
+            if (slide_text.val === undefined) continue
+            ctx.font = `${text.size}px ${text.font}`
+            ctx.fillStyle = text.color
+            ctx.textAlign = text.textAlign
+            ctx.textBaseline = text.textBaseline
+
+            // break after param update if offscreen
+            if (
+                (slide_i + 1) * pres.h < pres.cy - h / 2 / scale
+                || slide_i * pres.h > pres.cy + h / 2 / scale
+            ) { continue }
+            
+            // get initial lines
+            const val_lines = text.val.trim().split("\n")
+            // wrap lines at text box width
+            const lines = []
+            for (const line of val_lines) {
+                const words = line.split(" ")
+                let str = ""
+                for (const word of words) {
+                    if (ctx.measureText(str + word).width > text.w) {
+                        lines.push(str)
+                        str = ""
+                    }
+                    str += word + " "
+                }
+                lines.push(str)
+            }
+
+            // draw lines
+            ctx.translate(text.x, text.y)
+            for (const line of lines) {
+                ctx.fillText(line, 0, 0)
+                ctx.translate(0, text.size * 1.5)
+            }
+            ctx.setTransform(slide_mat)
+        }
+
+        ctx.translate(0, 900)
+        slide_mat = ctx.getTransform()
+    }
+
+    // slide bounds
+    // ctx.fillStyle = "#123"
+    // const balls = [[0, 450], [1600, 450], [800, 0], [800, 900]]
+    // for (const ball of balls) {
+    //     ctx.translate(ball[0], ball[1])
+    //     ctx.beginPath()
+    //     ctx.arc(0, 0, 20, 0, tau)
+    //     ctx.fill()
+    //     ctx.setTransform(slide_mat)
+    // }
+
+    // inet diagram (slide 11)
+    if (
+        11 * pres.h > pres.cy - h / 2 / scale
+        && 10 * pres.h < pres.cy + h / 2 / scale
+    ) {
+        ctx.resetTransform()
+        ctx.translate(w / 2, h / 2)
+        ctx.scale(scale, scale)
+        ctx.translate(-pres.w / 2, -pres.cy + 10 * pres.h)
+        slide_mat = ctx.getTransform()
+
+        // font style
+        ctx.font = "32px Courier New"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+
+        // cells/free ports
+        for (vert of verts) {
+            if (vert.type === "cell") draw_cell(vert, slide_mat)
+            else if (vert.free) {
+                // free port
+                ctx.fillStyle = "#000"
+                ctx.translate(vert.x, vert.y)
+                ctx.rotate(vert.angle)
+                ctx.translate(-15, 0)
+                ctx.rotate(-vert.angle)
+                ctx.fillText(vert.label, 0, 0)
+
+                ctx.setTransform(slide_mat)
+            }
+        }
+
+        // wires
+        for (const edge of edges) {
+            // (if not a cell -> port edge)
+            if (edge[0].type !== "cell") draw_wire(edge)
+        }
+
+        // mouse circle
+        ctx.setTransform(slide_mat)
+        // want [mx, my] relative to slide 11 coords
+        let mx = (mouse.x - w / 2) / scale + pres.w / 2
+        let my = (mouse.y - h / 2) / scale + pres.cy - 10 * pres.h
+        ctx.fillStyle = "#000"
+        // fade in as mouse enters slide
+        ctx.globalAlpha = 0.05 * clamp(
+            (pres.h / 2 - abs(my - pres.h / 2)) / 200,
+            0, 1
+        )
+        ctx.beginPath()
+        ctx.arc(mx, my, 200, 0, tau)
+        ctx.fill()
+        ctx.globalAlpha = 1
+    }
+}
+
+function fix_size() {
+    const c = canvas
+    if (c.width !== innerWidth || c.height !== innerHeight) {
+        c.width = innerWidth
+        c.height = innerHeight
+    }
+}
+</script>
+
+<script id="controls">
+const mouse = {
+    x: 0, y: 0,
+    px: 0, py: 0,
+    held: { 0: false, 1: false, 2: false },
+}
+
+function mouse_held(button) {
+    if (button === undefined) {
+        for (const b in mouse.held) {
+            if (mouse.held[b]) {
+                return true
+            }
+        }
+        return false
+    }
+    return button in mouse.held && mouse.held[button]
+}
+
+onmousemove = e => {
+    mouse.x = e.x
+    mouse.y = e.y
+}
+// oncontextmenu = e => e.preventDefault()
+onmousedown = e => {
+    if (e.button in mouse.held) {
+        mouse.held[e.button] = true
+    }
+}
+onmouseup = e => {
+    if (e.button in mouse.held) {
+        mouse.held[e.button] = false
+    }
+}
+onwheel = e => {
+    const [w, h] = [canvas.width, canvas.height]
+    const scale = min(w / pres.w, h / pres.h)
+    set_cy(pres.cy + e.deltaY / scale)
+}
+
+onkeydown = e => {
+    const t = timing
+    switch (e.key) {
+        case "0": set_cy(pres.h / 2); break
+        case "ArrowUp":
+        case "ArrowLeft":
+            next_slide(-1); break
+        case "ArrowDown":
+        case "ArrowRight":
+            next_slide(); break
+        // case " ": t.paused = !t.paused; break
+        case "r": init(); break
+    }
+}
+
+function next_slide(step = 1) {
+    const cur_slide = round((pres.cy - pres.h / 2) / pres.h)
+    set_cy((cur_slide + step) * pres.h + pres.h / 2)
+}
+
+function set_cy(cy) {
+    pres.cy = cy
+    localStorage.setItem("cy", cy)
+}
+</script>
+
+
+<script id="inet_def">
+function init() {
+    // free ports
+    const port_x = {
+        type: "port", free: true, label: "x",
+        x: 200, y: 300, angle: -pi / 2,
+    }
+    const port_y = {
+        type: "port", free: true, label: "y",
+        x: 300, y: 300, angle: -pi / 2,
+    }
+    const port_z = {
+        type: "port", free: true, label: "z",
+        x: 750, y: 450, angle: -pi / 2,
+    }
+    verts = [port_x, port_y, port_z]
+
+    edges = []
+
+    // cells (adds to edges)
+    const c0 = new_cell("0", 250, 100, pi / 2)
+    const cplus = new_cell("+", 250, 200, -pi / 2)
+
+    const c01 = new_cell("0", 450, 100, pi / 2)
+    const c02 = new_cell("0", 600, 100, pi / 2)
+    const c03 = new_cell("0", 750, 100, pi / 2)
+    const cs1 = new_cell("s", 450, 200, pi / 2)
+    const cs2 = new_cell("s", 600, 200, pi / 2)
+    const cs3 = new_cell("s", 750, 200, pi / 2)
+    const cplus2 = new_cell("+", 600, 300, -pi / 2)
+    const cplus3 = new_cell("+", 750, 300, -pi / 2)
+
+    // shift vert positions
+    for (const v of verts) {
+        v.x += 260
+        v.y += 260
+    }
+
+    // wires
+    edges.push({
+        0: c0.ports[0], 1: cplus.ports[0], cells: [c0, cplus],
+        is_primary: true,
+    })
+    edges.push(
+        {0: cplus.ports[2], 1: port_x, cells: [cplus]}
+    )
+    edges.push({0: cplus.ports[1], 1: port_y})
+
+    edges.push({
+        0: c01.ports[0], 1: cs1.ports[1], cells: [c01, cs1]
+    })
+    edges.push({
+        0: c02.ports[0], 1: cs2.ports[1], cells: [c02, cs2]
+    })
+    edges.push({
+        0: c03.ports[0], 1: cs3.ports[1], cells: [c03, cs3]
+    })
+    edges.push({
+        0: cs2.ports[0], 1: cplus2.ports[0], cells: [cs2, cplus2],
+        is_primary: true,
+    })
+    edges.push({
+        0: cs3.ports[0], 1: cplus3.ports[0], cells: [cs3, cplus3],
+        is_primary: true,
+    })
+    edges.push({
+        0: cs1.ports[0], 1: cplus2.ports[2], cells: [cs1, cplus2]
+    })
+    edges.push({
+        0: cplus2.ports[1], 1: cplus3.ports[2],
+        cells: [cplus2, cplus3],
+    })
+    edges.push({
+        0: cplus3.ports[1], 1: port_z, cells: [cplus3, port_z]
+    })
+
+    // rules
+    rules = [
+        {
+            match: ["0", "+"],
+            new_cells: [],
+            wires: [[0, 1]],
+        },
+        {
+            match: ["s", "+"],
+            new_cells: [
+                {label: "+", x: 80, y: 0, angle: 0},
+                {label: "s", x: 80, y: -40, angle: pi},
+            ],
+            wires: [
+                [0, 3],
+                [1, 6],
+                [2, 5],
+                [4, 7],
+            ]
+        }
+    ]
+}
+</script>
+
+<script id="inet_sim">
+// label -> n_ports
+const cell_types = {
+    "0": 1,
+    "s": 2,
+    "+": 3,
+}
+
+function new_cell(label, x, y, angle) {
+    // add cell
+    const cell = {type: "cell", label, x, y, angle, xv: 0, yv: 0}
+    verts.push(cell)
+
+    // construct cell ports
+    cell.ports = []
+    cell.ports.push({type: "port", label: 0, x, y, angle})
+    const n_ports = cell_types[label]
+    for (let i = 1; i < n_ports; i++) {
+        const dx = -60
+        const dy = (
+            n_ports === 2 ? 0 : 30 - 60 * (i - 1) / (n_ports - 2)
+        )
+        cell.ports.push({
+            type: "port",
+            label: i,
+            x: cell.x + cos(cell.angle) * dx - sin(cell.angle) * dy,
+            y: cell.y + sin(cell.angle) * dx + cos(cell.angle) * dy,
+            angle: cell.angle + pi,
+        })
+    }
+    // add/connect cell ports
+    for (const pv of cell.ports) {
+        verts.push(pv)
+        edges.push([cell, pv])
+    }
+
+    return cell
+}
+
+function update_cell(cell, dt) {
+    // some random movement
+    cell.xv += (rand() * 2 - 1) * 200 * dt
+    cell.yv += (rand() * 2 - 1) * 200 * dt
+
+    // slow down
+    cell.xv *= exp(log(0.01) * dt)
+    cell.yv *= exp(log(0.01) * dt)
+
+    // apply vel
+    cell.x += cell.xv * dt
+    cell.y += cell.yv * dt
+
+    // align towards primary port connection
+    const p0 = cell.ports[0]
+    let p0_next = null
+    for (const edge of edges) {
+        // skip if not a port/port edge involving primary
+        if (
+            edge[0].type === "cell" 
+            || !(edge[0].label === 0 || edge[1].label == 0)
+        ) continue
+
+        if (edge[0] === p0) p0_next = edge[1]
+        if (edge[1] === p0) p0_next = edge[0]
+    }
+    if (p0_next) {
+        const a = atan2(p0_next.y - p0.y, p0_next.x - p0.x)
+        cell.angle = lerp_angle(cell.angle, a, 2 * dt)
+    }
+
+    // update port positions/angles
+    cell.ports[0].x = cell.x
+    cell.ports[0].y = cell.y
+    cell.ports[0].angle = cell.angle
+    const n_ports = cell_types[cell.label]
+    for (let i = 1; i < cell.ports.length; i++) {
+        const dx = -60
+        const dy = (
+            n_ports === 2 ? 0 : 30 - 60 * (i - 1) / (n_ports - 2)
+        )
+        cell.ports[i].x = (
+            cell.x + cos(cell.angle) * dx - sin(cell.angle) * dy
+        )
+        cell.ports[i].y = (
+            cell.y + sin(cell.angle) * dx + cos(cell.angle) * dy
+        )
+        cell.ports[i].angle = cell.angle + pi
+    }
+}
+</script>
+
+<script id="inet_draw">
+function draw_cell(cell, transform) {
+    ctx.translate(cell.x, cell.y)
+    ctx.rotate(cell.angle)
+
+    ctx.fillStyle = "#64c8dc"
+    if (cell.ports.length === 1) {
+        // circle
+        ctx.beginPath()
+        ctx.arc(-30, 0, 30, 0, tau)
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.fillStyle = "#000"
+        ctx.translate(-30, 0)
+        ctx.rotate(-cell.angle)
+        ctx.fillText(cell.label, 0, 0)
+    } else {
+        // triangle
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.lineTo(-60, 50)
+        ctx.lineTo(-60, -50)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.fillStyle = "#000"
+        ctx.translate(-40, 0)
+        ctx.rotate(-cell.angle)
+        ctx.fillText(cell.label, 0, 0)
+    }
+
+    ctx.setTransform(transform)
+}
+
+function draw_wire(wire) {
+    const p1 = wire[0]
+    const p2 = wire[1]
+    let a1 = p1.angle
+    let a2 = p2.angle
+
+    // if transient port wire, flip angles
+    let p1_next = null
+    let p2_next = null
+    for (const edge of edges) {
+        if (edge[0] === p1 && edge[1] !== p2) p1_next = edge[1]
+        if (edge[1] === p1 && edge[0] !== p2) p1_next = edge[0]
+        if (edge[0] === p2 && edge[1] !== p1) p2_next = edge[1]
+        if (edge[1] === p2 && edge[0] !== p1) p2_next = edge[0]
+    }
+    if (
+        p1_next && p2_next
+        && p1_next.type === "port" && p2_next.type === "port"
+    ) {
+        a1 += pi
+        a2 += pi
+    }
+
+    // draw
+    ctx.beginPath()
+    ctx.moveTo(p1.x, p1.y)
+    const d = dist(p1.x, p1.y, p2.x, p2.y)
+    const curve_d = min(d / 2, 100)
+    ctx.bezierCurveTo(
+        p1.x + cos(a1) * curve_d,
+        p1.y + sin(a1) * curve_d,
+        p2.x + cos(a2) * curve_d,
+        p2.y + sin(a2) * curve_d,
+        p2.x, p2.y
+    )
+    ctx.stroke()
+}
+</script>
+
+</body>
+</html>
