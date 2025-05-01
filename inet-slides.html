@@ -320,7 +320,7 @@ const lerp = (a, b, t) => a * (1 - t) + b * t
 
 function lerp_angle(a, b, t) {
 	const theta = b - a
-	if (theta > math.pi) {
+	if (theta > pi) {
 		a = a + tau
     } else if (theta < -pi) {
 		a = a - tau
@@ -331,10 +331,13 @@ function lerp_angle(a, b, t) {
 
 <script id="main">
 const pres = {
-    w: 1600, h: 900, cy: 900 / 2
+    w: 1600, h: 900,
+    cy: 900 / 2, cy_vel: 0,
 }
 const lscy = parseFloat(localStorage.getItem("cy"))
+const lscy_vel = parseFloat(localStorage.getItem("cy_vel"))
 if (!isNaN(lscy)) { pres.cy = lscy }
+if (!isNaN(lscy_vel)) { pres.cy_vel = lscy_vel }
 
 const style = {
     heading: {
@@ -610,6 +613,9 @@ function loop() {
     }
     draw()
 
+    const ema_alpha = 1 - exp(-60 * t.dt)
+    mouse.xv_ma = lerp(mouse.xv_ma, mouse.x - mouse.px, ema_alpha)
+    mouse.yv_ma = lerp(mouse.yv_ma, mouse.y - mouse.py, ema_alpha)
     mouse.px = mouse.x
     mouse.py = mouse.y
     for (const touch of touches) {
@@ -629,14 +635,20 @@ function update(dt) {
     if (mouse_held()) {
         const dy = mouse.y - mouse.py
         set_cy(pres.cy - dy / scale)
-    }
-    if (touches.length > 0) {
+        set_cy_vel(mouse.yv_ma)
+    } else if (touches.length > 0) {
         let dy = 0
         for (const t of touches) {
             if (abs(t.y - t.py) > abs(dy))
             dy = t.y - t.py
         }
         set_cy(pres.cy - dy / scale)
+        // todo: touch vel
+    } else {
+        // apply velocity after releasing
+        set_cy(pres.cy - pres.cy_vel / scale)
+        // slow down
+        set_cy_vel(pres.cy_vel * exp(log(0.02) * dt))
     }
 
     // rest is only for slide 11 diagram
@@ -654,7 +666,7 @@ function update(dt) {
         // skip if not a primary port/port edge
         if (
             edge[0].type === "cell" 
-            || !(edge[0].label === 0 && edge[1].label == 0)
+            || !(edge[0].label === 0 && edge[1].label === 0)
         ) continue
 
         // primary plus mouse close
@@ -677,19 +689,19 @@ function update(dt) {
             
             const d = dist(c1.x, c1.y, c2.x, c2.y)
             if (d < 10) {
-                let rule_match = null
-                for (rule of rules) {
+                let rule = null
+                for (test_rule of rules) {
                     if (
-                        c1.label === rule.match[0]
-                        && c2.label === rule.match[1]
-                        || c2.label === rule.match[0]
-                        && c1.label === rule.match[1] 
+                        c1.label === test_rule.match[0]
+                        && c2.label === test_rule.match[1]
+                        || c2.label === test_rule.match[0]
+                        && c1.label === test_rule.match[1] 
                     ) {
-                        rule_match = rule
+                        rule = test_rule
                         break
                     }
                 }
-                if (rule_match !== null) {
+                if (rule !== null) {
                     // match order
                     if (c1.label !== rule.match[0]) {
                         [c1, c2] = [c2, c1]
@@ -1034,6 +1046,8 @@ function fix_size() {
 const mouse = {
     x: 0, y: 0,
     px: 0, py: 0,
+    // pixels/sec moving average
+    xv_ma: 0, yv_ma: 0,
     held: { 0: false, 1: false, 2: false },
 }
 
@@ -1127,6 +1141,10 @@ function next_slide(step = 1) {
 function set_cy(cy) {
     pres.cy = cy
     localStorage.setItem("cy", cy)
+}
+function set_cy_vel(cy_vel) {
+    pres.cy_vel = cy_vel
+    localStorage.setItem("cy_vel", cy_vel)
 }
 </script>
 
