@@ -18,6 +18,8 @@
 
     body {
         font-family: "Open Sans", sans-serif;
+        overscroll-behavior-y: contain;
+        touch-action: none;
     }
 </style>
 </head>
@@ -319,13 +321,13 @@ const clamp = (x, a, b) => min(max(x, a), b)
 const lerp = (a, b, t) => a * (1 - t) + b * t
 
 function lerp_angle(a, b, t) {
-	const theta = b - a
-	if (theta > pi) {
-		a = a + tau
+    const theta = b - a
+    if (theta > pi) {
+        a = a + tau
     } else if (theta < -pi) {
-		a = a - tau
+        a = a - tau
     }
-	return lerp(a, b, t)
+    return lerp(a, b, t)
 }
 </script>
 
@@ -618,10 +620,6 @@ function loop() {
     mouse.yv_ma = lerp(mouse.yv_ma, mouse.y - mouse.py, ema_alpha)
     mouse.px = mouse.x
     mouse.py = mouse.y
-    for (const touch of touches) {
-        touch.px = touch.x
-        touch.py = touch.y
-    }
 
     t.frame++
     requestAnimationFrame(loop)
@@ -636,14 +634,6 @@ function update(dt) {
         const dy = mouse.y - mouse.py
         set_cy(pres.cy - dy / scale)
         set_cy_vel(mouse.yv_ma)
-    } else if (touches.length > 0) {
-        let dy = 0
-        for (const t of touches) {
-            if (abs(t.y - t.py) > abs(dy))
-            dy = t.y - t.py
-        }
-        set_cy(pres.cy - dy / scale)
-        // todo: touch vel
     } else {
         // apply velocity after releasing
         set_cy(pres.cy - pres.cy_vel / scale)
@@ -686,7 +676,7 @@ function update(dt) {
             c1.yv += dy * accel * dt
             c2.xv -= dx * accel * dt
             c2.yv -= dy * accel * dt
-            
+
             const d = dist(c1.x, c1.y, c2.x, c2.y)
             if (d < 10) {
                 let rule = null
@@ -935,7 +925,7 @@ function draw() {
                 (slide_i + 1) * pres.h < pres.cy - h / 2 / scale
                 || slide_i * pres.h > pres.cy + h / 2 / scale
             ) { continue }
-            
+
             // get initial lines
             const val_lines = text.val.trim().split("\n")
             // wrap lines at text box width
@@ -1063,17 +1053,22 @@ function mouse_held(button) {
     return button in mouse.held && mouse.held[button]
 }
 
-onmousemove = e => {
-    mouse.x = e.x
-    mouse.y = e.y
-}
 oncontextmenu = e => e.preventDefault()
-onmousedown = e => {
+onpointermove = e => {
+    if (!e.isPrimary) return
+    mouse.x = e.clientX
+    mouse.y = e.clientY
+}
+onpointerdown = e => {
+    if (!e.isPrimary) return
     if (e.button in mouse.held) {
         mouse.held[e.button] = true
     }
+    mouse.x = mouse.px = e.clientX
+    mouse.y = mouse.py = e.clientY
 }
-onmouseup = e => {
+onpointerup = e => {
+    if (!e.isPrimary) return
     if (e.button in mouse.held) {
         mouse.held[e.button] = false
     }
@@ -1082,41 +1077,6 @@ onwheel = e => {
     const [w, h] = [canvas.width, canvas.height]
     const scale = min(w / pres.w, h / pres.h)
     set_cy(pres.cy + e.deltaY / scale)
-}
-
-const touches = []
-ontouchstart = e => {
-    e.preventDefault()
-    for (const t of e.changedTouches) {
-        const x = t.clientX
-        const y = t.clientY
-        touches.push({ id: t.identifier, x: x, y: y, px: x, py: y })
-        // todo: only set for taps
-        mouse.x = x
-        mouse.y = y
-    }
-}
-ontouchend = e => {
-    e.preventDefault()
-    for (const t of e.changedTouches) {
-        for (let i = touches.length - 1; i >= 0; i--) {
-            if (touches[i].id === t.identifier) {
-                touches.pop(i)
-            }
-        }
-    }
-}
-ontouchcancel = e => {
-    ontouchend(e)
-}
-ontouchmove = e => {
-    e.preventDefault()
-    for (const t of e.changedTouches) {
-        const touch = touches.find(v => v.id === t.identifier)
-        if (touch === undefined) continue
-        touch.x = t.clientX
-        touch.y = t.clientY
-    }
 }
 
 onkeydown = e => {
