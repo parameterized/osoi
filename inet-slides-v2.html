@@ -55,6 +55,20 @@
 </head>
 
 <body>
+<!--
+Abstract:
+Our intuition for how computation should be externalized is limited by the sequential nature of
+spoken language. It heavily influences our conscious strategies for evaluating and
+communicating computation, and so far, its limitations have been reflected in textual languages
+as well, including programming languages. Interaction nets are a visual language for
+computation that can be evaluated with spatially local graph rewrites, allowing for an unbounded
+degree of parallelism. They can be designed to have a deterministic result, invariant to evaluation
+order of the rewrites. In this presentation, we prove the Turing completeness of interaction nets,
+demonstrate parallel evaluation of structures that have nonlinear dependency graphs, such as
+mathematical expressions and cellular automata, and show how the degree of parallelism can
+adapt during computation.
+-->
+
 <div style="
     display: flex; position: absolute; z-index: -10;
     width: 100%; height: 100vh;">
@@ -74,6 +88,15 @@ Interaction Nets and Cellular Automata</div>
     font-size: 50px; color: #c0c8d1;">
 Troy Kidd</div>
 </div>
+
+$
+\gdef\tb#1{\textcolor{0070c0}{#1}}
+\gdef\tr#1{\textcolor{ff0000}{#1}}
+\gdef\tg#1{\textcolor{00b050}{#1}}
+\gdef\tm#1{\textcolor{cc0099}{#1}}
+\gdef\tp#1{\textcolor{7030a0}{#1}}
+\gdef\ora#1{\overrightarrow{#1}}
+$
 
 <div class="slide">
 <h1>Sequential Computation</h1>
@@ -116,29 +139,29 @@ a terminating computation).
 <div class="slide">
 <h1>Interaction Nets</h1>
 <pre>
-Definition 1.  An interaction net is a finite set of labeled
-cells (each having some number of ports), a set of free
-ports not associated with any cells, and a set of wires,
-connecting each port to another one.
+<b>Definition 1.</b>  An <i>interaction net</i> is a finite set of
+labeled <i>cells</i> (each having some number of <i>ports</i>), a
+set of <i>free ports</i> not associated with any cells, and a
+set of <i>wires</i>, connecting each port to another one.
 
-Cells have one principal port and $n \geq 0$ auxiliary ports
-(numbered in clockwise order), where $n$ is the arity of
+Cells have one <i>principal</i> port and $n \geq 0$ <i>auxiliary ports</i>
+(numbered in clockwise order), where $n$ is the <i>arity</i> of
 the cell’s symbol.
 
 Wires may connect ports of the same cell or exist as a
-cyclic wire not connecting any ports.
+<i>cyclic wire</i> not connecting any ports.
 </pre>
 </div>
 
 <div class="slide">
 <h1>Interaction Rules</h1>
 <pre>
-Definition 2.  An interaction rule is a pair of interaction
+<b>Definition 2.</b>  An <i>interaction rule</i> is a pair of interaction
 nets having the same set of free ports.
 
 The left-side net must consist of two cells with a wire
-between their principal ports, and a wire between each
-free port and an auxiliary port.
+between their principal ports, and a wire between
+each free port and an auxiliary port.
 
 Rules may have more than two cells on the right,
 allowing for an exponentially increasing number of
@@ -149,18 +172,18 @@ computations per step.
 <div class="slide">
 <h1>Reductions</h1>
 <pre>
-Definition 3.  A reduction (step) replaces a cell pair
+<b>Definition 3.</b>  A <i>reduction</i> (step) replaces a cell pair
 matching the left side of a rule with the right-side net.
 After identifying an active cell pair, all auxiliary ports are
 temporarily treated as being wired to corresponding
 free ports.
 
 Assume that we only use rule sets that can be applied
-unambiguously – at most one rule per unordered pair of
-cell symbols, and with order being irrelevant for pairs
+unambiguously – at most one rule per unordered pair
+of cell symbols, and with order being irrelevant for pairs
 with the same symbol.
 
-An unambiguous rule set is called an interaction system.
+An unambiguous rule set is called an <i>interaction system</i>.
 </pre>
 </div>
 
@@ -174,32 +197,31 @@ An unambiguous rule set is called an interaction system.
 <div class="slide">
 <h1>Confluence</h1>
 <pre>
-Theorem 1. (strong confluence)  If an interaction net $N$
-reduces to either $P$ or $Q$ in one step, with $P \neq Q$, then $P$
-and $Q$ can both reduce in one step to a common net $R$.
+<b>Theorem 1. (strong confluence)</b>  If an interaction net $\tb{N}$
+reduces to either $\tr{P}$ or $\tg{Q}$ in one step, with $\tr{P} \neq \tg{Q}$, then $\tr{P}$
+and $\tg{Q}$ can both reduce in one step to a common net $\tm{R}$.
 
-Proof.  Let $\{c_1, c_2\}$ be the cells involved in reduction
-of $N$ to $P$, and let $\{c_3, c_4\}$ be the same for $Q$.
+<i>Proof.</i>  Let $\{\tr{c_1}, \tr{c_2}\}$ be the cells involved in reduction of $\tb{N}$
+to $\tr{P}$, and let $\{\tg{c_3}, \tg{c_4}\}$ be the same for $\tg{Q}$.
 
-Since reductions apply only to cell pairs connected by
-their principal ports, and $P \neq Q$, then $\{c_1, c_2\} \cap \{c_3, c_4\}$
-$= \emptyset$.
+Since reductions apply only to cell pairs connected by their
+principal ports, and $\tr{P} \neq \tg{Q}$, then $\{\tr{c_1}, \tr{c_2}\} \cap \{\tg{c_3}, \tg{c_4}\} = \varnothing$.
 
-Therefore, $\{c_3, c_4\}$ would remain reducible after
-reducing $\{c_1, c_2\}$ and vice versa, so $R$ is the net with
-both reductions applied.							∎
+Therefore, $\{\tg{c_3}, \tg{c_4}\}$ would remain reducible after reducing
+$\{\tr{c_1}, \tr{c_2}\}$ and vice versa, so $\tm{R}$ is the net with both
+reductions applied.								   $\blacksquare$
 </pre>
 </div>
 
 <div class="slide">
 <h1>Confluence</h1>
 <pre>
-“Strong confluence” commonly refers only to the
-property that branching reduction sequences can
-always result in the same element.
+“Strong confluence” commonly refers only to the property
+that branching reduction sequences can always result in
+the same element.
 
-It guarantees that two diverging and terminating
-reduction sequences have the same result.
+It guarantees that two diverging and terminating reduction
+sequences have the same result.
 
 The version here with single step reductions additionally
 guarantees that both sequences have the same length.
@@ -210,19 +232,18 @@ This is sometimes referred to as the diamond property.
 <div class="slide">
 <h1>Expression Evaluation</h1>
 <pre>
-Example 1.  Unary addition.
+<b>Example 1.</b>  Unary addition.
 
 Cells $0$, $s$ (successor), and $+$, along with two
-interaction rules can be used reduce an
-addition expression to a normal form.
+interaction rules can be used reduce an addition
+expression to a normal form.
 
 From the diamond property, all possible
-reductions to an irreducible form reach the
-same form, with the same number of
-reduction steps.
+reductions to an irreducible form reach the same
+form, with the same number of reduction steps.
 
-In this example, an irreducible form is reached
-in $4$ steps, with both rules being applied twice,
+In this example, an irreducible form is reached in
+$4$ steps, with both rules being applied twice,
 possibly in only $2$ parallel reduction passes.
 </pre>
 </div>
@@ -245,81 +266,81 @@ possibly in only $2$ parallel reduction passes.
 <div class="slide">
 <h1>Turing Completeness</h1>
 <pre>
-Example 2.  Implementation of Turing machines.
+<b>Example 2.</b>  Implementation of Turing machines.
 
 A Turing machine is formally specified with the $7$-tuple
-$M = (Q, \Gamma, b, \Sigma, \delta, q_0, F)$, where:
+$M = (\tr{Q}, \tb{\Gamma}, \tb{b}, \tb{\Sigma}, \tg{\delta}, \tr{q_0}, \tr{F})$, where:
 
-$Q$ is a set of states the machine can be in,
-$\Gamma$ is a set of symbols that can be stored on a tape,
-$b \in \Gamma$ is the blank symbol (default if not specified),
-$\Sigma \subseteq \Gamma \setminus \{b\}$ is a set of valid input tape symbols,
-$\delta : (Q \setminus F) \times \Gamma \rightarrow Q \times \Gamma \times \{L, R\}$ is a transition function,
-$q_0 \in Q$ is the initial state of the machine,
-and $F \subseteq Q$ is a set of final states.
+
+$\tr{Q}$ is a set of states the machine can be in,
+$\tb{\Gamma}$ is a set of symbols that can be stored on a tape,
+$\tb{b} \in \tb{\Gamma}$ is the blank symbol (default if not specified),
+$\tb{\Sigma} \subseteq \tb{\Gamma} \setminus \{\tb{b}\}$ is a set of valid input tape symbols,
+$\tb{\delta} : (\tr{Q} \setminus \tr{F}) \times \tb{\Gamma} \rightarrow \tr{Q} \times \tb{\Gamma} \times \{\tg{L}, \tg{R}\}$ is a transition function,
+$\tr{q_0} \in \tr{Q}$ is the initial state of the machine,
+and $\tr{F} \subseteq \tr{Q}$ is a set of final states.
 </pre>
 </div>
 
 <div class="slide">
 <h1>Turing Completeness</h1>
 <pre>
-Example 2 (cont’d).  Implementation of Turing machines.
+<b>Example 2 (cont’d).</b>  Implementation of Turing machines.
 
-The primary elements are $Q$ (states), $\Gamma$ (symbols), and $\delta$
+The primary elements are $\tr{Q}$ (states), $\tb{\Gamma}$ (symbols), and $\tg{\delta}$
 (transition function). The rest are subsets or elements of
 these that denote valid initial and final conditions.
 
-Let $\ldots, a_{-2}, a_{-1}, a_0, a_1, a_2, \ldots$ denote the sequence
-of tape symbols. The read/write head starts at position $0$
-and in state $q_0$.
+Let $\tb{\ldots}, \tb{a}_{\tg{-2}}, \tb{a}_{\tg{-1}}, \tb{a}_{\tg{0}}, \tb{a}_{\tg{1}}, \tb{a}_{\tg{2}}, \tb{\ldots}$ denote the sequence of tape
+symbols. The read/write head starts at position $\tg{0}$ and in
+state $\tr{q_0}$.
 
-If $\delta(q, a) = (q', a', L)$, with $(q_0, a_0) = (q, a)$, then in the
-next configuration, we have $a_0 = a'$ with the head at
-position $-1$ and in state $q'$.
+If $\tg{\delta}(\tr{q}, \tb{a}) = (\tr{q'}, \tb{a'}, \tg{L})$, with $(\tr{q_0}, \tb{a}_{\tg{0}}) = (\tr{q}, \tb{a})$, then in the
+next configuration, we have $\tb{a}_{\tg{0}} = \tb{a'}$ with the head at
+position $\tg{-1}$ and in state $\tr{q'}$.
 </pre>
 </div>
 
 <div class="slide">
 <h1>Turing Completeness</h1>
 <pre>
-Example 2 (cont’d).  Implementation of Turing machines.
+<b>Example 2 (cont’d).</b>  Implementation of Turing machines.
 
 We can represent this configuration and transition with
 the nets in Figure 7.
 
-We orient the initial cells, and define interaction rules,
-so that there is exactly one active pair at each step.
+We orient the initial cells, and define interaction rules, so
+that there is exactly one active pair at each step.
 </pre>
 </div>
 
 <div class="slide">
 <h1>Turing Completeness</h1>
 <pre>
-Example 2 (cont’d).  Implementation of Turing machines.
+<b>Example 2 (cont’d).</b>  Implementation of Turing machines.
 
-If we instead initialize with $a_0$ and $a_1$ connected, the
-equivalent rule for $\delta(q, a) = (q', a', L)$ is different – with $q$
-changing $a_0$ and turning around instead of passing
+If we instead initialize with $\tb{a}_{\tg{0}}$ and $\tb{a}_{\tg{1}}$ connected, the
+equivalent rule for $\tg{\delta}(\tr{q}, \tb{a}) = (\tr{q'}, \tb{a'}, \tg{L})$ is different – with
+$\tr{q}$ changing $\tb{a}_{\tg{0}}$ and turning around instead of passing
 through.
 
 Since the rule depends on the last direction, we double
-the size of $Q$, so that a state $q$ is represented with either
-$q_L$ or $q_R$ depending on the previous transition (or
-init).
+the size of $\tr{Q}$, so that a state $\tr{q}$ is represented with either
+$\tr{q}_{\tg{L}}$ or $\tr{q}_{\tg{R}}$ depending on the previous transition (or init).
 
 We can then match an appropriate interaction rule and
-include direction info in the next state ($q_L'$).
+include direction info in the next state ($\color{ff0000} q_{\tg{L}}'$).
 </pre>
 </div>
 
 <div class="slide">
 <h1>Turing Completeness</h1>
 <pre>
-Example 2 (cont’d).  Implementation of Turing machines.
+<b>Example 2 (cont’d).</b>  Implementation of Turing machines.
 
-Since interaction nets are finite, both ends are
-terminated with cells that simulate interaction with a
-blank symbol and extend the tape.
+Since interaction nets are finite, both ends are terminated
+with cells that simulate interaction with a blank symbol
+and extend the tape.
 </pre>
 </div>
 
@@ -329,15 +350,13 @@ blank symbol and extend the tape.
 Typically, a cellular automaton (CA) is a regular network
 (line/grid/etc.) of cells with discrete states.
 
-Cells update simultaneously as a function of
-neighboring cells. Each cell replaces its state with
-$f(s_1, s_2, \ldots) \in S$, where $s_i$ are states of the cells in its
-neighborhood.
+Cells update simultaneously as a function of neighboring cells.
+Each cell replaces its state with $\tg{f}(\tb{s}_{\tr{1}}, \tb{s}_{\tr{2}}, \tb{\ldots}) \in \tb{S}$, where $\tb{s}_{\tr{i}}$ are
+states of the cells in its neighborhood.
 
-A configuration describes the state of all cells at some
-point in time. It is considered to extend infinitely in all
-directions, and can be represented as a function
-$c : \mathbb{Z}^d \rightarrow S$.
+A <i>configuration</i> describes the state of all cells at some point in
+time. It is considered to extend infinitely in all directions, and
+can be represented as a function $\tm{c} : \tr{\mathbb{Z}}^{\tp{d}} \rightarrow \tb{S}$.
 </pre>
 </div>
 
@@ -351,16 +370,16 @@ $c : \mathbb{Z}^d \rightarrow S$.
 <div class="slide">
 <h1>Finitely Specifiable Configurations</h1>
 <pre>
-Finite configurations consist of a finite number of cells
-not in some state $s \in S$, with all other cells being in state
-$s$.
+<i>Finite configurations</i> consist of a finite number of cells
+not in some state $\tb{s} \in \tb{S}$, with all other cells being in
+state $\tb{s}$.
 
-A configuration is periodic if it’s $\overrightarrow{r}$-periodic for at least
-one vector $\overrightarrow{r} \in \mathbb{Z}^d$, meaning the state of any cell $\overrightarrow{n}$ is
-the same as cell $\overrightarrow{n} + \overrightarrow{r}$.
+A configuration is <i>periodic</i> if it’s $\tr{\ora{r}}$-periodic for at least
+one vector $\tr{\ora{r}} \in \tr{\mathbb{Z}}^{\tp{d}}$, meaning the state of any cell $\tr{\ora{n}}$ is
+the same as cell $\tr{\ora{n}} + \tr{\ora{r}}$.
 
-A $d$-dimensional configuration is totally periodic if it’s
-$\overrightarrow{r_i}$-periodic for $d$ linearly independent vectors $\overrightarrow{r_i}$. For
+A $\tp{d}$-dimensional configuration is <i>totally periodic</i> if it’s
+$\red{\ora{r_{\tp{i}}}}$-periodic for $\tp{d}$ linearly independent vectors $\red{\ora{r_{\tp{i}}}}$. For
 these, the configuration can be fully described by some
 finite region of cells.
 </pre>
@@ -369,7 +388,7 @@ finite region of cells.
 <div class="slide">
 <h1>Cellular Automata</h1>
 <pre>
-Example 3.  Implementation of 1-dimensional CA.
+<b>Example 3.</b>  Implementation of $\tp{1}$-dimensional CA.
 
 We can implement a CA computation step with two
 parallel reductions. Cells interact with their left then
@@ -379,7 +398,7 @@ Since orientation is important here, we create a left and
 right-facing version of each state.
 
 We also add left and right-facing versions of each pair of
-original states (such as $\overline{rs}$), so reductions in the second
+original states (such as $\tb{\overline{rs}}$), so reductions in the second
 pass can consider both neighbors.
 </pre>
 </div>
@@ -394,9 +413,9 @@ pass can consider both neighbors.
 <div class="slide">
 <h1>Cellular Automata</h1>
 <pre>
-Example 3 (cont’d).  Implementation of 1D CA.
+<b>Example 3 (cont’d).</b>  Implementation of 1D CA.
 
-If we have a finite configuration (uniform state $p$ past
+If we have a finite configuration (uniform state $\tb{p}$ past
 some first and last cell), we can use a similar technique
 as before to allow the finite net to expand indefinitely.
 
@@ -415,10 +434,10 @@ attaching both ends together, if the period is even.
 <div class="slide">
 <h1>References</h1>
 <pre>
-1.  Lafont, Y. Interaction Nets. In Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on
+1.  Lafont, Y. <i>Interaction Nets</i>. In Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on
 Principles of Programming Languages (1989) 95-108.
 
-2.  Lafont, Y. Interaction Combinators. Information and Computation, 137 no. 1 (1997), 69-101.
+2.  Lafont, Y. <i>Interaction Combinators</i>. Information and Computation, <b>137</b> no. 1 (1997), 69-101.
 </pre>
 </div>
 
