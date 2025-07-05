@@ -33,6 +33,19 @@
         position: absolute; left: 100px; top: 220px;
         font-size: 32px; font-family: "Katex_Main"; color: #262626;
     }
+    x-slide button {
+        position: absolute; left: 100px; top: 220px;
+        font-size: 32px; font-family: "Katex_Main"; color: #262626;
+        background-color: #e9e9e9;
+        border: 1px solid #ccc;
+        border-radius: .5rem;
+        box-sizing: border-box;
+        line-height: 1.25rem;
+        padding: .75rem 1rem;
+        cursor: pointer;
+    }
+    x-slide button:hover { background-color: #ddd; }
+    x-slide button:focus { outline: 2px solid #ccc; }
     x-diagram div {
         background-color: #0001;
         font-size: 30px;
@@ -74,6 +87,7 @@ onresize = () => {
 
     window.scroll(0, new_scroll)
 }
+
 onload = () => {
     const _scroll = window.scrollY
     onresize()
@@ -96,7 +110,11 @@ onload = () => {
         d.append(name)
         diag.append(d)
     }
+
+    init()
+    loop()
 }
+
 onkeydown = e => {
     switch (e.key) {
     case "0":
@@ -109,17 +127,18 @@ onkeydown = e => {
     case "ArrowUp":
     case "ArrowLeft":
     case "k":
-        if (!e.shiftKey) {
+        if (!e.shiftKey && !e.altKey) {
             e.preventDefault()
             next_slide(-1)
         } break
     case "ArrowDown":
     case "ArrowRight":
     case "j":
-        if (!e.shiftKey) {
+        if (!e.shiftKey && !e.altKey) {
             e.preventDefault()
             next_slide()
         } break
+    case "r": init(); break
     }
 }
 
@@ -392,10 +411,9 @@ possibly in only $2$ parallel reduction passes.
 
 <x-slide>
 <h1>Expression Evaluation</h1>
-<pre>
-(r to reset)
-[interactive diagram]
-</pre>
+<button onclick="init()">reset</button>
+
+<canvas id="exp_eval_canvas" width="1600" height="900"></canvas>
 </x-slide>
 
 
@@ -619,7 +637,658 @@ Principles of Programming Languages (1989) 95-108.
 </pre>
 </x-slide>
 
-</div>
+</div> <!-- /slides -->
+
+
+<script id="math">
+const pi = Math.PI
+const tau = 2 * pi
+const cos = Math.cos
+const sin = Math.sin
+const atan2 = Math.atan2
+const min = Math.min
+const max = Math.max
+const abs = Math.abs
+const floor = Math.floor
+const ceil = Math.ceil
+const round = Math.round
+const exp = Math.exp
+const log = Math.log
+const rand = Math.random
+
+const dist = (x1, y1, x2, y2) => Math.sqrt(
+    (x2 - x1)**2 + (y2 - y1)**2
+)
+const clamp = (x, a, b) => min(max(x, a), b)
+const lerp = (a, b, t) => a * (1 - t) + b * t
+
+function lerp_angle(a, b, t) {
+    const theta = b - a
+    if (theta > pi) {
+        a = a + tau
+    } else if (theta < -pi) {
+        a = a - tau
+    }
+    return lerp(a, b, t)
+}
+</script>
+
+<script id="main">
+const canvas = document.querySelector("#exp_eval_canvas")
+const ctx = canvas.getContext("2d")
+
+const now = () => performance.now()
+let last_frame_time = now()
+
+function loop() {
+    const dt = (now() - last_frame_time) / 1000
+    last_frame_time = now()
+
+    update(dt)
+    draw()
+
+    requestAnimationFrame(loop)
+}
+
+function update(dt) {
+    const rect = canvas.getBoundingClientRect()
+    // skip if offscreen
+    if (
+        rect.y > innerHeight
+        || rect.y + rect.height < 0
+    ) { return }
+    const mx = (mouse.x - rect.x) / rect.width * canvas.width
+    const my = (mouse.y - rect.y) / rect.height * canvas.height
+
+    // no big jumps if fps < 10
+    dt = min(dt, 0.1)
+
+    // influence cell velocities to shorten primary wires,
+    // apply rewrite if short enough
+    for (const edge of edges) {
+        // skip if not a primary port/port edge
+        if (
+            edge[0].type === "cell" 
+            || !(edge[0].label === 0 && edge[1].label === 0)
+        ) continue
+
+        // primary plus mouse close
+        const rect = canvas.getBoundingClientRect()
+        const mx = (mouse.x - rect.x) / rect.width * canvas.width
+        const my = (mouse.y - rect.y) / rect.height * canvas.height
+        const md = dist(
+            mx, my,
+            (edge[0].x + edge[1].x) / 2,
+            (edge[0].y + edge[1].y) / 2,
+        )
+        if (edge.is_primary && md < 200) {
+            let [c1, c2] = edge.cells
+            const dx = c2.x - c1.x
+            const dy = c2.y - c1.y
+            const accel = 20 * max((200 - md) / 200, 0)
+            c1.xv += dx * accel * dt
+            c1.yv += dy * accel * dt
+            c2.xv -= dx * accel * dt
+            c2.yv -= dy * accel * dt
+
+            const d = dist(c1.x, c1.y, c2.x, c2.y)
+            if (d < 10) {
+                let rule = null
+                for (test_rule of rules) {
+                    if (
+                        c1.label === test_rule.match[0]
+                        && c2.label === test_rule.match[1]
+                        || c2.label === test_rule.match[0]
+                        && c1.label === test_rule.match[1] 
+                    ) {
+                        rule = test_rule
+                        break
+                    }
+                }
+                if (rule !== null) {
+                    // match order
+                    if (c1.label !== rule.match[0]) {
+                        [c1, c2] = [c2, c1]
+                    }
+
+                    // add aux ports to list
+                    const rule_ports = []
+                    for (let i = 1; i < c1.ports.length; i++) {
+                        rule_ports.push({port: c1.ports[i]})
+                    }
+                    for (let i = 1; i < c2.ports.length; i++) {
+                        rule_ports.push({port: c2.ports[i]})
+                    }
+
+                    // remove cells and primary wire
+                    for (let i = verts.length - 1; i >= 0; i--) {
+                        if (verts[i] === c1 || verts[i] === c2) {
+                            verts.splice(i, 1)
+                        }
+                    }
+                    for (let i = 0; i < edges.length; i++) {
+                        if (
+                            edges[i].cells && (
+                                edges[i].cells[0] === c1
+                                && edges[i].cells[1] === c2
+                                || edges[i].cells[1] === c1
+                                && edges[i].cells[0] === c2
+                            )
+                        ) {
+                            edges.splice(i, 1)
+                            break
+                        }
+                    }
+
+                    // add new cells and add ports to list
+                    const match_angle = atan2(
+                        c1.y - c2.y, c1.x - c2.x
+                    )
+                    const cx = (c1.x + c2.x) / 2
+                    const cy = (c1.y + c2.y) / 2
+                    for (const nc of rule.new_cells) {
+                        const a = match_angle + nc.angle
+                        const c = new_cell(
+                            nc.label,
+                            cx + cos(a) * nc.x - sin(a) * nc.y,
+                            cy + sin(a) * nc.x + cos(a) * nc.y,
+                            a,
+                        )
+                        for (let i = 0; i < c.ports.length; i++) {
+                            rule_ports.push({
+                                port: c.ports[i], cell: c
+                            })
+                        }
+                    }
+
+                    // add new wires
+                    for (const port_ids of rule.wires) {
+                        const rp1 = rule_ports[port_ids[0]]
+                        const rp2 = rule_ports[port_ids[1]]
+                        const new_wire = {
+                            0: rp1.port, 1: rp2.port, cells: []
+                        }
+                        if (rp1.cell) new_wire.cells.push(rp1.cell)
+                        if (rp2.cell) new_wire.cells.push(rp2.cell)
+                        if (
+                            new_wire.cells.length === 2
+                            && rp1.cell.ports[0] === rp1.port
+                            && rp2.cell.ports[0] === rp2.port
+                        ) {
+                            new_wire.is_primary = true
+                        }
+                        edges.push(new_wire)
+                    }
+                }
+            } 
+        }
+    }
+
+    // remove center port in (cell - port - port - port - cell) paths
+    // and possibly set wire as primary
+    for (let e_idx = edges.length - 1; e_idx >= 0; e_idx--) {
+        const edge = edges[e_idx]
+        const p1 = edge[0]
+        const p2 = edge[1]
+        if (!(p1.type === "port" && p2.type === "port")) continue
+
+        let p1_next = null
+        let p2_next = null
+        for (const edge2 of edges) {
+            if (edge2[0] === p1 && edge2[1] !== p2)
+                p1_next = edge2[1]
+            if (edge2[1] === p1 && edge2[0] !== p2)
+                p1_next = edge2[0]
+            if (edge2[0] === p2 && edge2[1] !== p1)
+                p2_next = edge2[1]
+            if (edge2[1] === p2 && edge2[0] !== p1)
+                p2_next = edge2[0]
+        }
+        if (!(p1_next && p2_next)) continue
+
+        if (p1_next.type === "cell" && p2_next.type === "port") {
+            // remove p2 and adjacent edges,
+            // then connect p1 and p2_next
+            for (let i = verts.length - 1; i >= 0; i--) {
+                if (verts[i] === p2) verts.splice(i, 1)
+            }
+            for (let i = edges.length - 1; i >= 0; i--) {
+                if (edges[i][0] === p2 || edges[i][1] === p2) {
+                    edges.splice(i, 1)
+                }
+            }
+            let p2_next_2 = null
+            for (const edge3 of edges) {
+                if (edge3[0] === p2_next && edge3[1] !== p2)
+                    p2_next_2 = edge3[1]
+                if (edge3[1] === p2_next && edge3[0] !== p2)
+                    p2_next_2 = edge3[0]
+            }
+
+            const new_wire = {
+                0: p1, 1: p2_next, cells: [p1_next]
+            }
+            if (p2_next_2 && p2_next_2.type === "cell") {
+                new_wire.cells.push(p2_next_2)
+            }
+            if (
+                new_wire.cells.length === 2
+                && p1_next.ports[0] === p1
+                && p2_next_2.ports[0] === p2_next
+            ) {
+                new_wire.is_primary = true
+            }
+            edges.push(new_wire)
+        }
+        // do it all over again but if p2_next is cell
+        if (p1_next.type === "port" && p2_next.type === "cell") {
+            // remove p1 and adjacent edges,
+            // then connect p1_next and p2
+            for (let i = verts.length - 1; i >= 0; i--) {
+                if (verts[i] === p1) verts.splice(i, 1)
+            }
+            for (let i = edges.length - 1; i >= 0; i--) {
+                if (edges[i][0] === p1 || edges[i][1] === p1) {
+                    edges.splice(i, 1)
+                }
+            }
+            let p1_next_2 = null
+            for (const edge3 of edges) {
+                if (edge3[0] === p1_next && edge3[1] !== p1)
+                    p1_next_2 = edge3[1]
+                if (edge3[1] === p1_next && edge3[0] !== p1)
+                    p1_next_2 = edge3[0]
+            }
+
+            const new_wire = {
+                0: p1_next, 1: p2, cells: [p2_next]
+            }
+            if (p1_next_2 && p1_next_2.type === "cell") {
+                new_wire.cells.push(p1_next_2)
+            }
+            if (
+                new_wire.cells.length === 2
+                && p1_next_2.ports[0] === p1_next
+                && p2_next.ports[0] === p2
+            ) {
+                new_wire.is_primary = true
+            }
+            edges.push(new_wire)
+        }
+    }
+
+    // update cells
+    for (const vert of verts) {
+        if (vert.type === "cell") update_cell(vert, dt)
+    }
+}
+
+function draw() {
+    const rect = canvas.getBoundingClientRect()
+    // skip if offscreen
+    if (
+        rect.y > innerHeight
+        || rect.y + rect.height < 0
+    ) { return }
+    const mx = (mouse.x - rect.x) / rect.width * canvas.width
+    const my = (mouse.y - rect.y) / rect.height * canvas.height
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // line style
+    ctx.strokeStyle = "#000"
+    ctx.lineCap = "round"
+    ctx.lineJoin = "round"
+    ctx.lineWidth = 2
+
+    // font style
+    ctx.font = "32px Katex_Main"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+
+    // cells/free ports
+    for (vert of verts) {
+        if (vert.type === "cell") draw_cell(vert)
+        else if (vert.free) {
+            // free port
+            ctx.fillStyle = "#000"
+            const _mat = ctx.getTransform()
+            ctx.translate(vert.x, vert.y)
+            ctx.rotate(vert.angle)
+            ctx.translate(-15, 0)
+            ctx.rotate(-vert.angle)
+            ctx.fillText(vert.label, 0, 0)
+
+            ctx.setTransform(_mat)
+        }
+    }
+
+    // wires
+    for (const edge of edges) {
+        // (if not a cell -> port edge)
+        if (edge[0].type !== "cell") draw_wire(edge)
+    }
+
+    // mouse circle
+    ctx.fillStyle = "#000"
+    // fade in as mouse enters slide
+    ctx.globalAlpha = 0.05 * clamp(
+        (450 - abs(my - 450)) / 200,
+        0, 1
+    )
+    ctx.beginPath()
+    ctx.arc(mx, my, 200, 0, tau)
+    ctx.fill()
+    ctx.globalAlpha = 1
+}
+</script>
+
+<script id="controls">
+const mouse = {
+    x: 0, y: 0,
+    held: { 0: false, 1: false, 2: false },
+}
+
+function mouse_held(button) {
+    if (button === undefined) {
+        for (const b in mouse.held) {
+            if (mouse.held[b]) {
+                return true
+            }
+        }
+        return false
+    }
+    return button in mouse.held && mouse.held[button]
+}
+
+onpointermove = e => {
+    if (!e.isPrimary) return
+    mouse.x = e.clientX
+    mouse.y = e.clientY
+}
+onpointerdown = e => {
+    if (!e.isPrimary) return
+    if (e.button in mouse.held) {
+        mouse.held[e.button] = true
+    }
+    mouse.x = e.clientX
+    mouse.y = e.clientY
+}
+onpointerup = e => {
+    if (!e.isPrimary) return
+    if (e.button in mouse.held) {
+        mouse.held[e.button] = false
+    }
+}
+</script>
+
+
+<script id="inet_def">
+function init() {
+    // free ports
+    const port_x = {
+        type: "port", free: true, label: "x",
+        x: 200, y: 300, angle: -pi / 2,
+    }
+    const port_y = {
+        type: "port", free: true, label: "y",
+        x: 300, y: 300, angle: -pi / 2,
+    }
+    const port_z = {
+        type: "port", free: true, label: "z",
+        x: 750, y: 450, angle: -pi / 2,
+    }
+    verts = [port_x, port_y, port_z]
+
+    edges = []
+
+    // cells (adds to edges)
+    const c0 = new_cell("0", 250, 100, pi / 2)
+    const cplus = new_cell("+", 250, 200, -pi / 2)
+
+    const c01 = new_cell("0", 450, 100, pi / 2)
+    const c02 = new_cell("0", 600, 100, pi / 2)
+    const c03 = new_cell("0", 750, 100, pi / 2)
+    const cs1 = new_cell("s", 450, 200, pi / 2)
+    const cs2 = new_cell("s", 600, 200, pi / 2)
+    const cs3 = new_cell("s", 750, 200, pi / 2)
+    const cplus2 = new_cell("+", 600, 300, -pi / 2)
+    const cplus3 = new_cell("+", 750, 300, -pi / 2)
+
+    // shift vert positions
+    for (const v of verts) {
+        v.x += 260
+        v.y += 260
+    }
+
+    // wires
+    edges.push({
+        0: c0.ports[0], 1: cplus.ports[0], cells: [c0, cplus],
+        is_primary: true,
+    })
+    edges.push(
+        {0: cplus.ports[2], 1: port_x, cells: [cplus]}
+    )
+    edges.push({0: cplus.ports[1], 1: port_y})
+
+    edges.push({
+        0: c01.ports[0], 1: cs1.ports[1], cells: [c01, cs1]
+    })
+    edges.push({
+        0: c02.ports[0], 1: cs2.ports[1], cells: [c02, cs2]
+    })
+    edges.push({
+        0: c03.ports[0], 1: cs3.ports[1], cells: [c03, cs3]
+    })
+    edges.push({
+        0: cs2.ports[0], 1: cplus2.ports[0], cells: [cs2, cplus2],
+        is_primary: true,
+    })
+    edges.push({
+        0: cs3.ports[0], 1: cplus3.ports[0], cells: [cs3, cplus3],
+        is_primary: true,
+    })
+    edges.push({
+        0: cs1.ports[0], 1: cplus2.ports[2], cells: [cs1, cplus2]
+    })
+    edges.push({
+        0: cplus2.ports[1], 1: cplus3.ports[2],
+        cells: [cplus2, cplus3],
+    })
+    edges.push({
+        0: cplus3.ports[1], 1: port_z, cells: [cplus3, port_z]
+    })
+
+    // rules
+    rules = [
+        {
+            match: ["0", "+"],
+            new_cells: [],
+            wires: [[0, 1]],
+        },
+        {
+            match: ["s", "+"],
+            new_cells: [
+                {label: "+", x: 80, y: 0, angle: 0},
+                {label: "s", x: 80, y: -40, angle: pi},
+            ],
+            wires: [
+                [0, 3],
+                [1, 6],
+                [2, 5],
+                [4, 7],
+            ]
+        }
+    ]
+}
+</script>
+
+<script id="inet_sim">
+// label -> n_ports
+const cell_types = {
+    "0": 1,
+    "s": 2,
+    "+": 3,
+}
+
+function new_cell(label, x, y, angle) {
+    // add cell
+    const cell = {type: "cell", label, x, y, angle, xv: 0, yv: 0}
+    verts.push(cell)
+
+    // construct cell ports
+    cell.ports = []
+    cell.ports.push({type: "port", label: 0, x, y, angle})
+    const n_ports = cell_types[label]
+    for (let i = 1; i < n_ports; i++) {
+        const dx = -60
+        const dy = (
+            n_ports === 2 ? 0 : 30 - 60 * (i - 1) / (n_ports - 2)
+        )
+        cell.ports.push({
+            type: "port",
+            label: i,
+            x: cell.x + cos(cell.angle) * dx - sin(cell.angle) * dy,
+            y: cell.y + sin(cell.angle) * dx + cos(cell.angle) * dy,
+            angle: cell.angle + pi,
+        })
+    }
+    // add/connect cell ports
+    for (const pv of cell.ports) {
+        verts.push(pv)
+        edges.push([cell, pv])
+    }
+
+    return cell
+}
+
+function update_cell(cell, dt) {
+    // some random movement
+    cell.xv += (rand() * 2 - 1) * 200 * dt
+    cell.yv += (rand() * 2 - 1) * 200 * dt
+
+    // slow down
+    cell.xv *= exp(log(0.01) * dt)
+    cell.yv *= exp(log(0.01) * dt)
+
+    // apply vel
+    cell.x += cell.xv * dt
+    cell.y += cell.yv * dt
+
+    // align towards primary port connection
+    const p0 = cell.ports[0]
+    let p0_next = null
+    for (const edge of edges) {
+        // skip if not a port/port edge involving primary
+        if (
+            edge[0].type === "cell" 
+            || !(edge[0].label === 0 || edge[1].label == 0)
+        ) continue
+
+        if (edge[0] === p0) p0_next = edge[1]
+        if (edge[1] === p0) p0_next = edge[0]
+    }
+    if (p0_next) {
+        const a = atan2(p0_next.y - p0.y, p0_next.x - p0.x)
+        cell.angle = lerp_angle(cell.angle, a, 2 * dt)
+    }
+
+    // update port positions/angles
+    cell.ports[0].x = cell.x
+    cell.ports[0].y = cell.y
+    cell.ports[0].angle = cell.angle
+    const n_ports = cell_types[cell.label]
+    for (let i = 1; i < cell.ports.length; i++) {
+        const dx = -60
+        const dy = (
+            n_ports === 2 ? 0 : 30 - 60 * (i - 1) / (n_ports - 2)
+        )
+        cell.ports[i].x = (
+            cell.x + cos(cell.angle) * dx - sin(cell.angle) * dy
+        )
+        cell.ports[i].y = (
+            cell.y + sin(cell.angle) * dx + cos(cell.angle) * dy
+        )
+        cell.ports[i].angle = cell.angle + pi
+    }
+}
+</script>
+
+<script id="inet_draw">
+function draw_cell(cell) {
+    const _mat = ctx.getTransform()
+    ctx.translate(cell.x, cell.y)
+    ctx.rotate(cell.angle)
+
+    ctx.fillStyle = "#64c8dc"
+    if (cell.ports.length === 1) {
+        // circle
+        ctx.beginPath()
+        ctx.arc(-30, 0, 30, 0, tau)
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.fillStyle = "#000"
+        ctx.translate(-30, 0)
+        ctx.rotate(-cell.angle)
+        ctx.fillText(cell.label, 0, 0)
+    } else {
+        // triangle
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.lineTo(-60, 50)
+        ctx.lineTo(-60, -50)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.fillStyle = "#000"
+        ctx.translate(-40, 0)
+        ctx.rotate(-cell.angle)
+        ctx.fillText(cell.label, 0, 0)
+    }
+
+    ctx.setTransform(_mat)
+}
+
+function draw_wire(wire) {
+    const p1 = wire[0]
+    const p2 = wire[1]
+    let a1 = p1.angle
+    let a2 = p2.angle
+
+    // if transient port wire, flip angles
+    let p1_next = null
+    let p2_next = null
+    for (const edge of edges) {
+        if (edge[0] === p1 && edge[1] !== p2) p1_next = edge[1]
+        if (edge[1] === p1 && edge[0] !== p2) p1_next = edge[0]
+        if (edge[0] === p2 && edge[1] !== p1) p2_next = edge[1]
+        if (edge[1] === p2 && edge[0] !== p1) p2_next = edge[0]
+    }
+    if (
+        p1_next && p2_next
+        && p1_next.type === "port" && p2_next.type === "port"
+    ) {
+        a1 += pi
+        a2 += pi
+    }
+
+    // draw
+    ctx.beginPath()
+    ctx.moveTo(p1.x, p1.y)
+    const d = dist(p1.x, p1.y, p2.x, p2.y)
+    const curve_d = min(d / 2, 100)
+    ctx.bezierCurveTo(
+        p1.x + cos(a1) * curve_d,
+        p1.y + sin(a1) * curve_d,
+        p2.x + cos(a2) * curve_d,
+        p2.y + sin(a2) * curve_d,
+        p2.x, p2.y
+    )
+    ctx.stroke()
+}
+</script>
 
 </body>
 </html>
