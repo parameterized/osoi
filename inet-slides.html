@@ -21,6 +21,7 @@
         width: 1600px; height: 900px;
         position: relative;
         display: block;
+        font-size: 32px;
     }
     x-slide:nth-child(2n) {
         background-color: #e7e9de;
@@ -31,7 +32,7 @@
     }
     x-slide pre {
         position: absolute; left: 100px; top: 220px;
-        font-size: 32px; font-family: "Katex_Main"; color: #262626;
+        font-family: "Katex_Main"; color: #262626;
     }
     x-slide button {
         position: absolute; left: 100px; top: 220px;
@@ -46,7 +47,7 @@
     }
     x-slide button:hover { background-color: #ddd; }
     x-slide button:focus { outline: 2px solid #ccc; }
-    x-diagram div {
+    .placeholder {
         background-color: #0001;
         font-size: 30px;
         text-align: center;
@@ -102,13 +103,20 @@ onload = () => {
         for (const [k, v] of Object.entries(args)) {
             kvs[k] = v
         }
-        diag.innerHTML = ""
-        const d = document.createElement("div")
-        d.style = `
-            position: absolute; left: ${kvs.x}px; top: ${kvs.y}px;
-            width: ${kvs.w}px; height: ${kvs.h}px;`
-        d.append(name)
-        diag.append(d)
+
+        diag.style = `
+            position: absolute; left: ${kvs.x}px; top: ${kvs.y}px;`
+        diag.setAttribute("alt", name)
+        diag.innerHTML = src.slice(src.indexOf("}") + 1).trim()
+        if (diag.innerHTML === "") {
+            const d = document.createElement("div")
+            d.className = "placeholder"
+            d.style = `
+                position: absolute; left: 0px; top: 0px;
+                width: ${kvs.w}px; height: ${kvs.h}px;`
+            d.append(name)
+            diag.append(d)
+        }
     }
 
     init()
@@ -242,11 +250,56 @@ indefinitely far sites is physically unrealistic.
 </pre>
 
 <x-diagram> turing machine
-{ x: 990, y: 190, w: 430, h: 135 }
+{ x: 990, y: 190, w: 425, h: 135 }
+<svg width="425" height="135" style="
+    position: absolute; left: 0px; top: 0px;">
+    <g id="g-tape" fill="none" stroke="black" stroke-width="2">
+        <polygon points="180,2, 270,2, 225,65" />
+        <polyline points="0,75, 420,75" />
+        <polyline points="0,130, 420,130" />
+        <polyline points="45,75, 45,130" />
+        <polyline points="120,75, 120,130" />
+        <polyline points="200,75, 200,130" />
+        <polyline points="250,75, 250,130" />
+        <polyline points="310,75, 310,130" />
+        <polyline points="370,75, 370,130" />
+    </g>
+    <div style="position: absolute; left: 212px; top: 4px;">
+        $\tr{q_0}$</div>
+    <div style="position: absolute; left: 9px; top: 82px;">
+        $\tb{...} ~~~ \tb{a}_{\tg{-2}} ~~~~ \tb{a}_{\tg{-1}}
+        ~~~ \tb{a}_{\tg{0}} ~~~ \tb{a}_{\tg{1}}
+        ~~~~ \tb{a}_{\tg{2}} ~~~~ \tb{...}$</div>
+</svg>
 </x-diagram>
+
 <x-diagram> multi tape turing machine {
     y: 490, h: 290,
-} </x-diagram>
+}
+<svg width="425" height="290" style="
+    position: absolute; left: 0px; top: 0px;">
+    <use xlink:href="#g-tape" />
+    <use xlink:href="#g-tape" y="154" />
+
+    <div style="position: absolute; left: 212px; top: 4px;">
+        $\tr{q_0^{\tg{1}}}$</div>
+    <div style="position: absolute; left: 9px; top: 82px;">
+        $\tb{...} ~~~ \tb{a_{\tg{-2}}^{\tg{1}}}
+        ~~~~ \tb{a_{\tg{-1}}^{\tg{1}}}
+        ~~~ \tb{a_{\tg{0}}^{\tg{1}}}
+        ~~~ \tb{a_{\tg{1}}^{\tg{1}}}
+        ~~~~ \tb{a_{\tg{2}}^{\tg{1}}} ~~~~ \tb{...}$</div>
+
+    <div style="position: absolute; left: 212px; top: 158px;">
+        $\tr{q_0^{\tg{2}}}$</div>
+    <div style="position: absolute; left: 9px; top: 236px;">
+        $\tb{...} ~~~ \tb{a_{\tg{-2}}^{\tg{2}}}
+        ~~~~ \tb{a_{\tg{-1}}^{\tg{2}}}
+        ~~~ \tb{a_{\tg{0}}^{\tg{2}}}
+        ~~~ \tb{a_{\tg{1}}^{\tg{2}}}
+        ~~~~ \tb{a_{\tg{2}}^{\tg{2}}} ~~~~ \tb{...}$</div>
+</svg>
+</x-diagram>
 </x-slide>
 
 
@@ -455,7 +508,7 @@ The primary elements are $\tr{Q}$ (states), $\tb{\Gamma}$ (symbols), and $\tg{\d
 (transition function). The rest are subsets or elements of
 these that denote valid initial and final conditions.
 
-Let $\tb{\ldots}, \tb{a}_{\tg{-2}}, \tb{a}_{\tg{-1}}, \tb{a}_{\tg{0}}, \tb{a}_{\tg{1}}, \tb{a}_{\tg{2}}, \tb{\ldots}$ denote the sequence of tape
+Let $\tb{...}, \tb{a}_{\tg{-2}}, \tb{a}_{\tg{-1}}, \tb{a}_{\tg{0}}, \tb{a}_{\tg{1}}, \tb{a}_{\tg{2}}, \tb{...}$ denote the sequence of tape
 symbols. The read/write head starts at position $\tg{0}$ and in
 state $\tr{q_0}$.
 
@@ -530,7 +583,7 @@ Typically, a cellular automaton (CA) is a regular network
 (line/grid/etc.) of cells with discrete states.
 
 Cells update simultaneously as a function of neighboring cells.
-Each cell replaces its state with $\tg{f}(\tb{s}_{\tr{1}}, \tb{s}_{\tr{2}}, \tb{\ldots}) \in \tb{S}$, where $\tb{s}_{\tr{i}}$ are
+Each cell replaces its state with $\tg{f}(\tb{s}_{\tr{1}}, \tb{s}_{\tr{2}}, \tb{...}) \in \tb{S}$, where $\tb{s}_{\tr{i}}$ are
 states of the cells in its neighborhood.
 
 A <i>configuration</i> describes the state of all cells at some point in
