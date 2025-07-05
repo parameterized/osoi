@@ -14,43 +14,101 @@
         background-color: #eef1e5;
         font-family: "Katex_Main";
     }
-    .katex {
-        font-size: 1em;
-    }
+    .katex { font-size: 1em; }
+    .slides { transform-origin: left top; }
     .slide {
-        width: 100%;
-        height: 900px;
-    }
-    .slide:nth-child(2n+1) {
-        background-color: #e7e9de;
+        width: 1600px; height: 900px;
+        position: relative;
     }
     .slide h1 {
-        position: relative; left: 100px; top: 110px; width: 900px;
+        position: absolute; left: 100px; top: 110px;
         font-size: 50px; font-weight: normal; color: #50b4c8;
     }
     .slide pre {
-        position: relative; left: 100px; top: 150px; width: 900px;
-        font-size: 30px; color: #262626;
-        font-family: "Katex_Main";
+        position: absolute; left: 100px; top: 260px;
+        font-size: 30px; font-family: "Katex_Main"; color: #262626;
     }
 </style>
+
 <script defer src="lib/katex.js"></script>
 <script defer src="lib/auto-render.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        renderMathInElement(document.body, {
-            delimiters: [
-                { left: "$$", right: "$$", display: true },
-                { left: "$", right: "$", display: false },
-            ],
-            throwOnError: false,
-            ignoredTags: [
-                "script", "noscript", "style", "textarea", "code",
-                "option",
-            ],
-            output: "html",
-        });
-    });
+addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false },
+        ],
+        throwOnError: false,
+        ignoredTags: [
+            "script", "noscript", "style", "textarea", "code",
+            "option",
+        ],
+        output: "html",
+    })
+})
+
+let scale = 1
+onresize = () => {
+    const new_scale = innerWidth / 1600
+    const new_scroll = (
+        window.scrollY + innerHeight / 2
+    ) * new_scale / scale - innerHeight / 2 + 0.5
+    scale = new_scale
+
+    const slides = document.getElementsByClassName("slides")[0]
+    slides.style.transform = `scale(${scale})`
+    const n_slides = document.getElementsByClassName("slide").length
+    slides.style.height = `${900 * n_slides * scale}px`
+
+    window.scroll(0, new_scroll)
+}
+onload = () => {
+    const _scroll = window.scrollY
+    onresize()
+    window.scroll(0, _scroll)
+
+    const slides = document.getElementsByClassName("slide")
+    window.slides = slides
+    for (let i = 0; i < slides.length; i++) {
+        if (i % 2 == 0) continue
+        const bg = document.createElement("div")
+        bg.style = "height: 900px; background-color: #e7e9de;"
+        slides[i].prepend(bg)
+    }
+}
+onkeydown = e => {
+    switch (e.key) {
+        case "0":
+            window.scrollTo({ top: 0, behavior: "smooth" }); break
+        case "ArrowUp":
+        case "ArrowLeft":
+            if (!e.shiftKey) {
+                e.preventDefault()
+                next_slide(-1)
+            }
+            break
+        case "ArrowDown":
+        case "ArrowRight":
+            if (!e.shiftKey) {
+                e.preventDefault()
+                next_slide()
+            }
+            break
+    }
+}
+
+function next_slide(step = 1) {
+    const cur_slide = Math.floor(
+        (window.scrollY + innerHeight / 2) / 900 / scale
+    )
+    window.scrollTo({
+        top: (
+            cur_slide + step + 0.5
+        ) * 900 * scale - innerHeight / 2 + 0.5,
+        behavior: "smooth",
+    })
+}
 </script>
 </head>
 
@@ -69,15 +127,17 @@ mathematical expressions and cellular automata, and show how the degree of paral
 adapt during computation.
 -->
 
-<div style="
-    display: flex; position: absolute; z-index: -10;
-    width: 100%; height: 100vh;">
-<div style="width: 6.75%; background-color: #333b45;"></div>
-<div style="width: 31.5%; background-color: #4c5967;"></div>
-<div style="width: 61.75%; background-color: #657689;"></div>
-</div>
+<div class="slides">
 
 <div class="slide">
+<div style="
+    display: flex; position: absolute; z-index: -10;
+    width: 100%; height: 900px;">
+    <div style="width: 6.75%; background-color: #333b45;"></div>
+    <div style="width: 31.5%; background-color: #4c5967;"></div>
+    <div style="width: 61.75%; background-color: #657689;"></div>
+</div>
+
 <div style="
     position: absolute; left: 700px; top: 315px; width: 600px;
     font-size: 60px; color: #fff;">
@@ -439,6 +499,8 @@ Principles of Programming Languages (1989) 95-108.
 
 2.  Lafont, Y. <i>Interaction Combinators</i>. Information and Computation, <b>137</b> no. 1 (1997), 69-101.
 </pre>
+</div>
+
 </div>
 
 </body>
