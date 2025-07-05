@@ -11,22 +11,33 @@
 <style>
     body {
         margin: 0;
+        overflow-x: hidden;
         background-color: #eef1e5;
         font-family: "Katex_Main";
     }
     .katex { font-size: 1em; }
     .slides { transform-origin: left top; }
-    .slide {
+    x-slide {
         width: 1600px; height: 900px;
         position: relative;
+        display: block;
     }
-    .slide h1 {
-        position: absolute; left: 100px; top: 110px;
-        font-size: 50px; font-weight: normal; color: #50b4c8;
+    x-slide:nth-child(2n) {
+        background-color: #e7e9de;
     }
-    .slide pre {
-        position: absolute; left: 100px; top: 260px;
-        font-size: 30px; font-family: "Katex_Main"; color: #262626;
+    x-slide h1 {
+        position: absolute; left: 100px; top: 70px;
+        font-size: 52px; font-weight: normal; color: #50b4c8;
+    }
+    x-slide pre {
+        position: absolute; left: 100px; top: 220px;
+        font-size: 32px; font-family: "Katex_Main"; color: #262626;
+    }
+    x-diagram div {
+        background-color: #0001;
+        font-size: 30px;
+        text-align: center;
+        align-content: center;
     }
 </style>
 
@@ -56,10 +67,10 @@ onresize = () => {
     ) * new_scale / scale - innerHeight / 2 + 0.5
     scale = new_scale
 
-    const slides = document.getElementsByClassName("slides")[0]
+    const slides = document.querySelector(".slides")
     slides.style.transform = `scale(${scale})`
-    const n_slides = document.getElementsByClassName("slide").length
-    slides.style.height = `${900 * n_slides * scale}px`
+    const n_slides = document.querySelectorAll("x-slide").length
+    slides.style.height = `${900 * n_slides * Math.min(scale, 1)}px`
 
     window.scroll(0, new_scroll)
 }
@@ -68,34 +79,68 @@ onload = () => {
     onresize()
     window.scroll(0, _scroll)
 
-    const slides = document.getElementsByClassName("slide")
-    window.slides = slides
-    for (let i = 0; i < slides.length; i++) {
-        if (i % 2 == 0) continue
-        const bg = document.createElement("div")
-        bg.style = "height: 900px; background-color: #e7e9de;"
-        slides[i].prepend(bg)
+    const kvs = {}
+    for (const diag of document.querySelectorAll("x-diagram")) {
+        const src = diag.innerHTML.trim()
+        const args_start = src.indexOf("{")
+        const name = src.slice(0, args_start).trim()
+        const args = parse_kvs(src.slice(args_start + 1, -1).trim())
+        for (const [k, v] of Object.entries(args)) {
+            kvs[k] = v
+        }
+        diag.innerHTML = ""
+        const d = document.createElement("div")
+        d.style = `
+            position: absolute; left: ${kvs.x}px; top: ${kvs.y}px;
+            width: ${kvs.w}px; height: ${kvs.h}px;`
+        d.append(name)
+        diag.append(d)
     }
 }
 onkeydown = e => {
     switch (e.key) {
-        case "0":
-            window.scrollTo({ top: 0, behavior: "smooth" }); break
-        case "ArrowUp":
-        case "ArrowLeft":
-            if (!e.shiftKey) {
-                e.preventDefault()
-                next_slide(-1)
-            }
-            break
-        case "ArrowDown":
-        case "ArrowRight":
-            if (!e.shiftKey) {
-                e.preventDefault()
-                next_slide()
-            }
-            break
+    case "0":
+        window.scrollTo({ top: 0, behavior: "smooth" }); break
+    case "G":
+        window.scrollTo({
+            top: document.body.clientHeight - innerHeight,
+            behavior: "smooth",
+        }); break
+    case "ArrowUp":
+    case "ArrowLeft":
+    case "k":
+        if (!e.shiftKey) {
+            e.preventDefault()
+            next_slide(-1)
+        } break
+    case "ArrowDown":
+    case "ArrowRight":
+    case "j":
+        if (!e.shiftKey) {
+            e.preventDefault()
+            next_slide()
+        } break
     }
+}
+
+function parse_kvs(kv_str) {
+    // convert "a: b, c: 1.23" to object
+    const kv_lines = kv_str.split(",")
+    const kvs = {}
+    for (const kv of kv_lines) {
+        if (kv.indexOf(":") === -1) continue
+
+        let [k, v] = kv.split(":", 2)
+        k = k.trim()
+        v = v.trim()
+        const flv = parseFloat(v)
+        if (isNaN(flv)) {
+            kvs[k] = v
+        } else {
+            kvs[k] = flv
+        }
+    }
+    return kvs
 }
 
 function next_slide(step = 1) {
@@ -129,7 +174,7 @@ adapt during computation.
 
 <div class="slides">
 
-<div class="slide">
+<x-slide>
 <div style="
     display: flex; position: absolute; z-index: -10;
     width: 100%; height: 900px;">
@@ -147,7 +192,6 @@ Interaction Nets and Cellular Automata</div>
     position: absolute; left: 700px; top: 550px;
     font-size: 50px; color: #c0c8d1;">
 Troy Kidd</div>
-</div>
 
 $
 \gdef\tb#1{\textcolor{0070c0}{#1}}
@@ -157,8 +201,10 @@ $
 \gdef\tp#1{\textcolor{7030a0}{#1}}
 \gdef\ora#1{\overrightarrow{#1}}
 $
+</x-slide>
 
-<div class="slide">
+
+<x-slide>
 <h1>Sequential Computation</h1>
 <pre>
 Turing machines model one computational action, at
@@ -175,9 +221,17 @@ but they still compute with one centralized transition
 function, and constant time computation involving
 indefinitely far sites is physically unrealistic.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> turing machine
+{ x: 990, y: 190, w: 430, h: 135 }
+</x-diagram>
+<x-diagram> multi tape turing machine {
+    y: 490, h: 290,
+} </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Parallel Computation</h1>
 <pre>
 Interaction nets were developed by Yves Lafont in 1990,
@@ -194,9 +248,13 @@ Many replacements can occur in parallel and can be
 repeated until there are no rule matches (in the case of
 a terminating computation).
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> interaction net { x: 960, y: 290, w: 360, h: 300 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Interaction Nets</h1>
 <pre>
 <b>Definition 1.</b>  An <i>interaction net</i> is a finite set of
@@ -211,9 +269,12 @@ the cell’s symbol.
 Wires may connect ports of the same cell or exist as a
 <i>cyclic wire</i> not connecting any ports.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> interaction net {} </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Interaction Rules</h1>
 <pre>
 <b>Definition 2.</b>  An <i>interaction rule</i> is a pair of interaction
@@ -227,9 +288,13 @@ Rules may have more than two cells on the right,
 allowing for an exponentially increasing number of
 computations per step.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> interaction rules { x: 1030, y: 200, w: 340, h: 450 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Reductions</h1>
 <pre>
 <b>Definition 3.</b>  A <i>reduction</i> (step) replaces a cell pair
@@ -245,16 +310,22 @@ with the same symbol.
 
 An unambiguous rule set is called an <i>interaction system</i>.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> reduction { x: 920, y: 240, w: 580, h: 360 } </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Reductions</h1>
 <pre>
 [hoc logo]
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> hoc logo { x: 430, y: 260, w: 710, h: 400 } </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Confluence</h1>
 <pre>
 <b>Theorem 1. (strong confluence)</b>  If an interaction net $\tb{N}$
@@ -271,9 +342,12 @@ Therefore, $\{\tg{c_3}, \tg{c_4}\}$ would remain reducible after reducing
 $\{\tr{c_1}, \tr{c_2}\}$ and vice versa, so $\tm{R}$ is the net with both
 reductions applied.								   $\blacksquare$
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> confluence { x: 940, y: 60, w: 640, h: 800 } </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Confluence</h1>
 <pre>
 “Strong confluence” commonly refers only to the property
@@ -287,9 +361,13 @@ The version here with single step reductions additionally
 guarantees that both sequences have the same length.
 This is sometimes referred to as the diamond property.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> confluence {} </x-diagram>
+<x-diagram> diamond { x: 390, y: 700, w: 140, h: 150 } </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Expression Evaluation</h1>
 <pre>
 <b>Example 1.</b>  Unary addition.
@@ -306,24 +384,28 @@ In this example, an irreducible form is reached in
 $4$ steps, with both rules being applied twice,
 possibly in only $2$ parallel reduction passes.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> unary addition { x: 790, y: 120, w: 780, h: 710 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Expression Evaluation</h1>
 <pre>
 (r to reset)
 [interactive diagram]
 </pre>
-</div>
+</x-slide>
 
-<div class="slide">
-<h1></h1>
-<pre>
-[reduction paths diagram]
-</pre>
-</div>
 
-<div class="slide">
+<x-slide>
+<x-diagram> reduction paths { x: 150, y: 70, w: 1250, h: 710 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Turing Completeness</h1>
 <pre>
 <b>Example 2.</b>  Implementation of Turing machines.
@@ -340,9 +422,13 @@ $\tb{\delta} : (\tr{Q} \setminus \tr{F}) \times \tb{\Gamma} \rightarrow \tr{Q} \
 $\tr{q_0} \in \tr{Q}$ is the initial state of the machine,
 and $\tr{F} \subseteq \tr{Q}$ is a set of final states.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> turing machine step { x: 1000, y: 290, w: 420, h: 320 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Turing Completeness</h1>
 <pre>
 <b>Example 2 (cont’d).</b>  Implementation of Turing machines.
@@ -359,9 +445,12 @@ If $\tg{\delta}(\tr{q}, \tb{a}) = (\tr{q'}, \tb{a'}, \tg{L})$, with $(\tr{q_0}, 
 next configuration, we have $\tb{a}_{\tg{0}} = \tb{a'}$ with the head at
 position $\tg{-1}$ and in state $\tr{q'}$.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> turing machine step {} </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Turing Completeness</h1>
 <pre>
 <b>Example 2 (cont’d).</b>  Implementation of Turing machines.
@@ -372,9 +461,13 @@ the nets in Figure 7.
 We orient the initial cells, and define interaction rules, so
 that there is exactly one active pair at each step.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> inet tm implementation { x: 900, y: 50, w: 590, h: 680 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Turing Completeness</h1>
 <pre>
 <b>Example 2 (cont’d).</b>  Implementation of Turing machines.
@@ -391,9 +484,12 @@ $\tr{q}_{\tg{L}}$ or $\tr{q}_{\tg{R}}$ depending on the previous transition (or 
 We can then match an appropriate interaction rule and
 include direction info in the next state ($\color{ff0000} q_{\tg{L}}'$).
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> implementation with q0 coming from right {} </x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Turing Completeness</h1>
 <pre>
 <b>Example 2 (cont’d).</b>  Implementation of Turing machines.
@@ -402,9 +498,14 @@ Since interaction nets are finite, both ends are terminated
 with cells that simulate interaction with a blank symbol
 and extend the tape.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> a tape-extending reduction
+{ x: 950, y: 130, w: 550, h: 520 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Cellular Automata</h1>
 <pre>
 Typically, a cellular automaton (CA) is a regular network
@@ -418,16 +519,19 @@ A <i>configuration</i> describes the state of all cells at some point in
 time. It is considered to extend infinitely in all directions, and
 can be represented as a function $\tm{c} : \tr{\mathbb{Z}}^{\tp{d}} \rightarrow \tb{S}$.
 </pre>
-</div>
 
-<div class="slide">
-<h1></h1>
-<pre>
-[glider gun, rule 90]
-</pre>
-</div>
+<x-diagram> 1D and 2D CA steps { x: 1000, y: 170, w: 460, h: 490 }
+</x-diagram>
+</x-slide>
 
-<div class="slide">
+
+<x-slide>
+<x-diagram> glider gun, rule 90 { x: 120, y: 150, w: 1410, h: 530 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Finitely Specifiable Configurations</h1>
 <pre>
 <i>Finite configurations</i> consist of a finite number of cells
@@ -443,9 +547,14 @@ $\red{\ora{r_{\tp{i}}}}$-periodic for $\tp{d}$ linearly independent vectors $\re
 these, the configuration can be fully described by some
 finite region of cells.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> finite and periodic configs
+{ x: 920, y: 250, w: 610, h: 500 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Cellular Automata</h1>
 <pre>
 <b>Example 3.</b>  Implementation of $\tp{1}$-dimensional CA.
@@ -461,16 +570,19 @@ We also add left and right-facing versions of each pair of
 original states (such as $\tb{\overline{rs}}$), so reductions in the second
 pass can consider both neighbors.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> inet ca implementation { x: 930, y: 210, w: 540, h: 390 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Cellular Automata</h1>
-<pre>
-[example]
-</pre>
-</div>
+<x-diagram> example { x: 400, y: 190, w: 1110, h: 550 } </x-diagram>
+</x-slide>
 
-<div class="slide">
+
+<x-slide>
 <h1>Cellular Automata</h1>
 <pre>
 <b>Example 3 (cont’d).</b>  Implementation of 1D CA.
@@ -482,16 +594,22 @@ as before to allow the finite net to expand indefinitely.
 We can instead represent periodic configurations by
 attaching both ends together, if the period is even.
 </pre>
-</div>
 
-<div class="slide">
+<x-diagram> config expanding reduction
+{ x: 860, y: 190, w: 610, h: 400 }
+</x-diagram>
+<x-diagram> periodic reduction { x: 240, y: 620, w: 400, h: 260 }
+</x-diagram>
+</x-slide>
+
+
+<x-slide>
 <h1>Cellular Automata</h1>
-<pre>
-[example]
-</pre>
-</div>
+<x-diagram> example { x: 450, y: 210, w: 1060, h: 500 } </x-diagram>
+</x-slide>
 
-<div class="slide">
+
+<x-slide>
 <h1>References</h1>
 <pre>
 1.  Lafont, Y. <i>Interaction Nets</i>. In Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on
@@ -499,7 +617,7 @@ Principles of Programming Languages (1989) 95-108.
 
 2.  Lafont, Y. <i>Interaction Combinators</i>. Information and Computation, <b>137</b> no. 1 (1997), 69-101.
 </pre>
-</div>
+</x-slide>
 
 </div>
 
