@@ -55,6 +55,7 @@
         align-content: center;
     }
     x-diagram div { position: absolute; }
+    x-diagram a { color: #262626; }
 </style>
 
 <script defer src="lib/katex.js"></script>
@@ -406,8 +407,7 @@ computations per step.
         <polygon points="36,154, 36,174" />
         <polygon points="84,154, 84,174" />
 
-        <path fill="none"
-            d="M 226 174 C 226 124, 274 124, 274 174" />
+        <path fill="none" d="M 226,174 C 226,124 274,124 274,174" />
 
         <polygon points="10,280, 102,280, 56,344" />
         <polygon points="56,364, 108,420, 4,420" />
@@ -475,8 +475,7 @@ An unambiguous rule set is called an <i>interaction system</i>.
         <polygon points="174,74, 174,104" />
         <polygon points="174,166, 174,266" />
         <polygon points="208,326, 208,348" />
-        <path fill="none"
-            d="M 92 250 C 92 368, 140 348, 140 326" />
+        <path fill="none" d="M 92,250 C 92,358 140,358 140 326" />
 
         <ellipse cx="378" cy="38" rx="36" ry="36" />
         <ellipse cx="518" cy="38" rx="36" ry="36" />
@@ -490,8 +489,7 @@ An unambiguous rule set is called an <i>interaction system</i>.
         <polygon points="412,166, 412,208" />
         <polygon points="552,166, 552,208" />
         <polygon points="552,270, 552,356" />
-        <path fill="none"
-            d="M 412 270 C 412 356, 484 356, 484 166" />
+        <path fill="none" d="M 412,270 C 412,356 484,356 484,166" />
     </g>
 </svg>
 <div style="left: 50px; top: 20px;">$0$</div>
@@ -516,11 +514,13 @@ An unambiguous rule set is called an <i>interaction system</i>.
 
 <x-slide>
 <h1>Reductions</h1>
-<pre>
-[hoc logo]
+<x-diagram> hoc logo { x: 450, y: 260, w: 700, h: 400 }
+<img src="lib/hoc_logo.gif" width="700">
+<pre style="left: 80px; top: 400px;">
+<b>Figure 4.</b>  An infinite reduction sequence.
+            Source: <a href="https://higherorderco.com/" target="_blank" rel="noopener noreferrer">higherorderco.com</a>
 </pre>
-
-<x-diagram> hoc logo { x: 430, y: 260, w: 710, h: 400 } </x-diagram>
+</x-diagram>
 </x-slide>
 
 
@@ -542,7 +542,121 @@ $\{\tr{c_1}, \tr{c_2}\}$ and vice versa, so $\tm{R}$ is the net with both
 reductions applied.								   $\blacksquare$
 </pre>
 
-<x-diagram> confluence { x: 940, y: 60, w: 640, h: 800 } </x-diagram>
+<x-diagram> confluence { x: 930, y: 106, w: 640, h: 760 }
+<svg width="640" height="760">
+    <g id="g-confluence">
+        <rect fill="#f1cdc3" x="2" y="92" width="120" height="170"
+            rx="16" ry="16" />
+        <rect fill="#cbe7cf" x="126" y="92" width="120" height="246"
+            rx="16" ry="16" />
+        <rect fill="#f1cdc3" x="316" y="92" width="150" height="190"
+            rx="16" ry="16" />
+        <rect fill="#cbe7cf" x="124" y="546" width="150" height="190"
+            rx="16" ry="16" />
+
+        <g fill="#64c8dc" stroke="black" stroke-width="2">
+            <ellipse cx="62" cy="38" rx="36" ry="36" />
+            <ellipse cx="186" cy="38" rx="36" ry="36" />
+            <polygon points="16,104, 108,104, 62,166" />
+            <polygon points="144,104, 228,104, 186,166" />
+            <polygon points="6,250, 62,190, 118,250" />
+            <polygon points="134,326, 186,266, 238,326" />
+            <polygon points="62,74, 62,104" />
+            <polygon points="62,166, 62,190" />
+            <polygon points="28,250, 28,348" />
+            <polygon points="186,74, 186,104" />
+            <polygon points="186,166, 186,266" />
+            <polygon points="220,326, 220,348" />
+            <path fill="none"
+                d="M 96,250 C 96,358 152,358 152,326" />
+
+            <ellipse cx="378" cy="38" rx="36" ry="36" />
+            <ellipse cx="526" cy="38" rx="36" ry="36" />
+            <polygon points="324,166, 378,104, 432,166" />
+            <polygon points="484,104, 568,104, 526,166" />
+            <polygon points="366,208, 458,208, 412,270" />
+            <polygon points="474,326, 526,266, 578,326" />
+            <polygon points="378,74, 378,104" />
+            <polygon points="526,74, 526,104" />
+            <polygon points="344,166, 344,356" />
+            <polygon points="412,166, 412,208" />
+            <polygon points="526,74, 526,104" />
+            <polygon points="526,166, 526,266" />
+            <polygon points="560,326, 560,348" />
+            <path fill="none"
+                d="M 412,270 C 412,358 492,358 492,326" />
+
+            <ellipse cx="62" cy="492" rx="36" ry="36" />
+            <ellipse cx="186" cy="492" rx="36" ry="36" />
+            <polygon points="16,558, 108,558, 62,620" />
+            <polygon points="132,620, 186,558, 240,620" />
+            <polygon points="6,704, 62,644, 118,704" />
+            <polygon points="174,662, 266,662, 220,724" />
+            <polygon points="62,528, 62,558" />
+            <polygon points="62,620, 62,644" />
+            <polygon points="28,704, 28,754" />
+            <polygon points="186,528, 186,558" />
+            <polygon points="220,620, 220,662" />
+            <polygon points="220,724, 220,754" />
+            <path fill="none"
+                d="M 96,704 C 96,754 152,754 152,620" />
+
+            <ellipse cx="398" cy="492" rx="36" ry="36" />
+            <ellipse cx="546" cy="492" rx="36" ry="36" />
+            <polygon points="344,620, 398,558, 452,620" />
+            <polygon points="492,620, 546,558, 600,620" />
+            <polygon points="386,662, 478,662, 432,724" />
+            <polygon points="534,662, 626,662, 580,724" />
+            <polygon points="398,528, 398,558" />
+            <polygon points="546,528, 546,558" />
+            <polygon points="364,620, 364,754" />
+            <polygon points="432,620, 432,662" />
+            <polygon points="580,620, 580,662" />
+            <polygon points="580,724, 580,754" />
+            <path fill="none"
+                d="M 432,724 C 432,754 512,754 512,620" />
+        </g>
+    </g>
+</svg>
+
+<div style="left: 54px; top: 20px;">$0$</div>
+<div style="left: 178px; top: 20px;">$0$</div>
+<div style="left: 54px; top: 108px;">$s$</div>
+<div style="left: 178px; top: 108px;">$s$</div>
+<div style="left: 50px; top: 206px;">$+$</div>
+<div style="left: 174px; top: 282px;">$+$</div>
+
+<div style="left: 370px; top: 20px;">$0$</div>
+<div style="left: 518px; top: 20px;">$0$</div>
+<div style="left: 366px; top: 118px;">$+$</div>
+<div style="left: 518px; top: 108px;">$s$</div>
+<div style="left: 404px; top: 210px;">$s$</div>
+<div style="left: 514px; top: 282px;">$+$</div>
+
+<div style="left: 54px; top: 474px;">$0$</div>
+<div style="left: 178px; top: 474px;">$0$</div>
+<div style="left: 54px; top: 562px;">$s$</div>
+<div style="left: 174px; top: 572px;">$+$</div>
+<div style="left: 50px; top: 660px;">$+$</div>
+<div style="left: 212px; top: 664px;">$s$</div>
+
+<div style="left: 390px; top: 474px;">$0$</div>
+<div style="left: 538px; top: 474px;">$0$</div>
+<div style="left: 386px; top: 572px;">$+$</div>
+<div style="left: 534px; top: 572px;">$+$</div>
+<div style="left: 424px; top: 664px;">$s$</div>
+<div style="left: 572px; top: 664px;">$s$</div>
+
+<div style="left: 268px; top: 170px;">$\rightarrow$</div>
+<div style="left: 288px; top: 570px;">$\rightarrow$</div>
+<div style="left: 114px; top: 386px;">$\downarrow$</div>
+<div style="left: 454px; top: 386px;">$\downarrow$</div>
+
+<div style="left: 240px; top: -60px;">$\tb{N}$</div>
+<div style="left: 600px; top: -60px;">$\tr{P}$</div>
+<div style="left: 240px; top: 420px;">$\tg{Q}$</div>
+<div style="left: 600px; top: 420px;">$\tm{R}$</div>
+</x-diagram>
 </x-slide>
 
 
@@ -561,8 +675,60 @@ guarantees that both sequences have the same length.
 This is sometimes referred to as the diamond property.
 </pre>
 
-<x-diagram> confluence {} </x-diagram>
-<x-diagram> diamond { x: 390, y: 700, w: 140, h: 150 } </x-diagram>
+<x-diagram> confluence {}
+<svg width="640" height="760">
+    <use xlink:href="#g-confluence" />
+</svg>
+
+<div style="left: 54px; top: 20px;">$0$</div>
+<div style="left: 178px; top: 20px;">$0$</div>
+<div style="left: 54px; top: 108px;">$s$</div>
+<div style="left: 178px; top: 108px;">$s$</div>
+<div style="left: 50px; top: 206px;">$+$</div>
+<div style="left: 174px; top: 282px;">$+$</div>
+
+<div style="left: 370px; top: 20px;">$0$</div>
+<div style="left: 518px; top: 20px;">$0$</div>
+<div style="left: 366px; top: 118px;">$+$</div>
+<div style="left: 518px; top: 108px;">$s$</div>
+<div style="left: 404px; top: 210px;">$s$</div>
+<div style="left: 514px; top: 282px;">$+$</div>
+
+<div style="left: 54px; top: 474px;">$0$</div>
+<div style="left: 178px; top: 474px;">$0$</div>
+<div style="left: 54px; top: 562px;">$s$</div>
+<div style="left: 174px; top: 572px;">$+$</div>
+<div style="left: 50px; top: 660px;">$+$</div>
+<div style="left: 212px; top: 664px;">$s$</div>
+
+<div style="left: 390px; top: 474px;">$0$</div>
+<div style="left: 538px; top: 474px;">$0$</div>
+<div style="left: 386px; top: 572px;">$+$</div>
+<div style="left: 534px; top: 572px;">$+$</div>
+<div style="left: 424px; top: 664px;">$s$</div>
+<div style="left: 572px; top: 664px;">$s$</div>
+
+<div style="left: 268px; top: 170px;">$\rightarrow$</div>
+<div style="left: 288px; top: 570px;">$\rightarrow$</div>
+<div style="left: 114px; top: 386px;">$\downarrow$</div>
+<div style="left: 454px; top: 386px;">$\downarrow$</div>
+
+<div style="left: 240px; top: -60px;">$\tb{N}$</div>
+<div style="left: 600px; top: -60px;">$\tr{P}$</div>
+<div style="left: 240px; top: 420px;">$\tg{Q}$</div>
+<div style="left: 600px; top: 420px;">$\tm{R}$</div>
+</x-diagram>
+
+<x-diagram> diamond { x: 390, y: 690, w: 140, h: 150 }
+<div style="left: 64px; top: 2px;">$\tb{N}$</div>
+<div style="left: 2x; top: 70px;">$\tr{P}$</div>
+<div style="left: 124px; top: 70px;">$\tg{Q}$</div>
+<div style="left: 64px; top: 142px;">$\tm{R}$</div>
+<div style="left: 28px; top: 32px;">$\swarrow$</div>
+<div style="left: 94px; top: 32px;">$\searrow$</div>
+<div style="left: 28px; top: 104px;">$\searrow$</div>
+<div style="left: 94px; top: 104px;">$\swarrow$</div>
+</x-diagram>
 </x-slide>
 
 
