@@ -130,8 +130,9 @@ onkeydown = e => {
     case "0":
         window.scrollTo({ top: 0, behavior: "smooth" }); break
     case "G":
+        const n_slides = document.querySelectorAll("x-slide").length
         window.scrollTo({
-            top: document.body.clientHeight - innerHeight,
+            top: 900 * n_slides * scale - innerHeight,
             behavior: "smooth",
         }); break
     case "ArrowUp":
