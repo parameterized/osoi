@@ -344,7 +344,7 @@ a terminating computation).
 <div style="left: 208px; top: 118px;">$\gamma$</div>
 <div style="left: 24px; top: 262px;">
     $x \quad y \quad z \qquad~~ w$</div>
-<pre style="left: -40px; top: 350px;">
+<pre style="left: -10px; top: 320px;">
 <b>Figure 1.</b>  An interaction net.
 </pre>
 </x-diagram>
@@ -376,7 +376,7 @@ Wires may connect ports of the same cell or exist as a
 <div style="left: 208px; top: 118px;">$\gamma$</div>
 <div style="left: 24px; top: 262px;">
     $x \quad y \quad z \qquad~~ w$</div>
-<pre style="left: -40px; top: 350px;">
+<pre style="left: -10px; top: 320px;">
 <b>Figure 1.</b>  An interaction net.
 </pre>
 </x-diagram>
@@ -436,7 +436,7 @@ computations per step.
     $x \quad y \qquad \qquad~ x \quad y$</div>
 <div style="left: 148px; top: 96px;">$\rightarrow$</div>
 <div style="left: 148px; top: 334px;">$\rightarrow$</div>
-<pre style="left: -80px; top: 510px;">
+<pre style="left: -70px; top: 470px;">
 <b>Figure 2.</b>  Two interaction rules.
 The first represents inferring $y = x$ from
 $y = 0 + x$.
@@ -507,7 +507,7 @@ An unambiguous rule set is called an <i>interaction system</i>.
 <div style="left: 506px; top: 120px;">$+$</div>
 <div style="left: 404px; top: 212px;">$s$</div>
 <div style="left: 544px; top: 212px;">$s$</div>
-<pre style="left: 0px; top: 420px;">
+<pre style="left: -10px; top: 390px;">
 <b>Figure 3.</b>  Two reduction steps applied in parallel.
 </pre>
 </x-diagram>
@@ -1005,7 +1005,7 @@ possibly in only $2$ parallel reduction passes.
 <div style="left: 868px; top: 150px;">$\rightarrow$</div>
 <div style="left: 200px; top: 300px;">$\downarrow$</div>
 <div style="left: 610px; top: 300px;">$\downarrow$</div>
-<div style="left: 860px; top: 330px; rotate: 45deg;">
+<div style="left: 858px; top: 330px; rotate: 45deg;">
     $\Longrightarrow$</div>
 <div style="left: 998px; top: 270px;">$\downarrow$</div>
 <div style="left: 462px; top: 526px;">$\rightarrow$</div>
@@ -1037,6 +1037,39 @@ and $\tr{F} \subseteq \tr{Q}$ is a set of final states.
 </pre>
 
 <x-diagram> turing machine step { x: 1000, y: 290, w: 420, h: 320 }
+<svg width="420" height="320">
+    <g id="g-tm-step" fill="none" stroke="black" stroke-width="2">
+        <use xlink:href="#g-tape" />
+        <polygon points="115,188, 205,188, 160,251" />
+        <polyline points="0,261, 420,261" />
+        <polyline points="0,316, 420,316" />
+        <polyline points="45,261, 45,316" />
+        <polyline points="120,261, 120,316" />
+        <polyline points="200,261, 200,316" />
+        <polyline points="250,261, 250,316" />
+        <polyline points="310,261, 310,316" />
+        <polyline points="370,261, 370,316" />
+    </g>
+</svg>
+
+<div style="left: 212px; top: 4px;">
+    $\tr{q_0}$</div>
+<div style="left: 9px; top: 82px;">
+    $\tb{...} \quad \tb{a}_{\tg{-2}} \quad \tb{a}_{\tg{-1}}
+    \quad \tb{a}_{\tg{0}} \quad \tb{a}_{\tg{1}}
+    \quad \tb{a}_{\tg{2}} \quad \tb{...}$</div>
+
+<div style="left: 150px; top: 190px;">
+    $\tr{q'}$</div>
+<div style="left: 9px; top: 268px;">
+    $\tb{...} \quad \tb{a}_{\tg{-2}} \quad \tb{a}_{\tg{-1}}
+    \quad \tb{a'} \quad \tb{a}_{\tg{1}}
+    \quad \tb{a}_{\tg{2}} \quad \tb{...}$</div>
+
+<pre style="left: 0px; top: 350px;">
+<b>Figure 6.</b>  Initial and subsequent
+configurations.
+</pre>
 </x-diagram>
 </x-slide>
 
@@ -1059,7 +1092,30 @@ next configuration, we have $\tb{a}_{\tg{0}} = \tb{a'}$ with the head at
 position $\tg{-1}$ and in state $\tr{q'}$.
 </pre>
 
-<x-diagram> turing machine step {} </x-diagram>
+<x-diagram> turing machine step {}
+<svg width="420" height="320">
+    <use xlink:href="#g-tm-step" />
+</svg>
+
+<div style="left: 212px; top: 4px;">
+    $\tr{q_0}$</div>
+<div style="left: 9px; top: 82px;">
+    $\tb{...} \quad \tb{a}_{\tg{-2}} \quad \tb{a}_{\tg{-1}}
+    \quad \tb{a}_{\tg{0}} \quad \tb{a}_{\tg{1}}
+    \quad \tb{a}_{\tg{2}} \quad \tb{...}$</div>
+
+<div style="left: 150px; top: 190px;">
+    $\tr{q'}$</div>
+<div style="left: 9px; top: 268px;">
+    $\tb{...} \quad \tb{a}_{\tg{-2}} \quad \tb{a}_{\tg{-1}}
+    \quad \tb{a'} \quad \tb{a}_{\tg{1}}
+    \quad \tb{a}_{\tg{2}} \quad \tb{...}$</div>
+
+<pre style="left: 0px; top: 350px;">
+<b>Figure 6.</b>  Initial and subsequent
+configurations.
+</pre>
+</x-diagram>
 </x-slide>
 
 
@@ -1076,6 +1132,104 @@ that there is exactly one active pair at each step.
 </pre>
 
 <x-diagram> inet tm implementation { x: 900, y: 50, w: 590, h: 680 }
+<svg width="590" height="680">
+    <g id="g-inet-tm" fill="#64c8dc" stroke="black" stroke-width="2">
+        <g fill="#cbe7cf" stroke="none">
+            <rect x="246" y="16" width="108" height="172"
+                rx="16" ry="16" />
+            <rect x="246" y="242" width="108" height="172"
+                rx="16" ry="16" />
+        </g>
+        <g fill="#ff7c80" stroke="black" stroke-width="2">
+            <polygon points="254,26, 346,26, 300,86" />
+            <polygon points="164,490, 256,490, 210,550" />
+        </g>
+
+        <polygon points="80,110, 140,156, 80,202" />
+        <polygon points="166,110, 226,156, 166,202" />
+        <polygon points="254,178, 300,118, 346,178" />
+        <polygon points="386,156, 446,110, 446,202" />
+        <polygon points="472,156, 532,110, 532,202" />
+        <polygon points="54,156, 80,156" />
+        <polygon points="140,156, 166,156" />
+        <polygon points="446,156, 472,156" />
+        <polygon points="532,156, 558,156" />
+        <polygon points="300,86, 300,118" />
+
+        <polygon points="80,336, 140,382, 80,428" />
+        <polygon points="166,336, 226,382, 166,428" />
+        <polygon points="386,382, 446,336, 446,428" />
+        <polygon points="472,382, 532,336, 532,428" />
+        <polygon points="54,382, 80,382" />
+        <polygon points="140,382, 166,382" />
+        <polygon points="446,382, 472,382" />
+        <polygon points="532,382, 558,382" />
+        <polygon points="300,312, 300,344" />
+
+        <polygon points="80,576, 140,622, 80,668" />
+        <polygon points="164,642, 210,582, 256,642" />
+        <polygon points="300,622, 360,576, 360,668" />
+        <polygon points="386,622, 446,576, 446,668" />
+        <polygon points="472,622, 532,576, 532,668" />
+        <polygon points="54,622, 80,622" />
+        <polygon points="360,622, 386,622" />
+        <polygon points="446,622, 472,622" />
+        <polygon points="532,622, 558,622" />
+        <polygon points="210,550, 210,582" />
+        <path fill="none" d="M 140,622 C 170,622 140,672 172,672" />
+        <path fill="none" d="M 172,672 Q 210,672 210,642" />
+        <path fill="none" d="M 210,490 Q 210,470 260,470" />
+        <path fill="none" d="M 260,470 C 360,470 210,622 300,622" />
+    </g>
+    <g stroke="black" stroke-width="2">
+        <polygon fill="#ff7c80" points="254,344, 346,344, 300,404" />
+        <polygon fill="#64c8dc" points="254,252, 346,252, 300,312" />
+
+        <path fill="none" d="M 226,156 C 256,156 226,206 258,206" />
+        <path fill="none" d="M 258,206 Q 300,206 300,178" />
+        <path fill="none" d="M 300,26 Q 300,4 350,4" />
+        <path fill="none" d="M 350,4 C 450,4 300,156 386,156" />
+
+        <path fill="none" d="M 226,382 C 256,382 226,432 258,432" />
+        <path fill="none" d="M 258,432 Q 300,432 300,404" />
+        <path fill="none" d="M 300,252 Q 300,230 350,230" />
+        <path fill="none" d="M 350,230 C 450,230 300,382 386,382" />
+    </g>
+</svg>
+
+<div style="left: 292px; top: 26px;">$q$</div>
+<div style="left: 16px; top: 134px;">$...$</div>
+<div style="left: 84px; top: 130px;">$a_{-2}$</div>
+<div style="left: 170px; top: 130px;">$a_{-1}$</div>
+<div style="left: 286px; top: 132px;">$a_0$</div>
+<div style="left: 410px; top: 130px;">$a_1$</div>
+<div style="left: 496px; top: 130px;">$a_2$</div>
+<div style="left: 570px; top: 134px;">$...$</div>
+<div style="left: 110px; top: 220px;">$\downarrow$</div>
+
+<div style="left: 292px; top: 256px;">$a'$</div>
+<div style="left: 16px; top: 360px;">$...$</div>
+<div style="left: 84px; top: 356px;">$a_{-2}$</div>
+<div style="left: 170px; top: 356px;">$a_{-1}$</div>
+<div style="left: 290px; top: 348px;">$q'$</div>
+<div style="left: 410px; top: 356px;">$a_1$</div>
+<div style="left: 496px; top: 356px;">$a_2$</div>
+<div style="left: 570px; top: 360px;">$...$</div>
+<div style="left: 110px; top: 450px; rotate: 90deg;">$=$</div>
+
+<div style="left: 202px; top: 492px;">$q'$</div>
+<div style="left: 16px; top: 600px;">$...$</div>
+<div style="left: 84px; top: 596px;">$a_{-2}$</div>
+<div style="left: 190px; top: 600px;">$a_{-1}$</div>
+<div style="left: 326px; top: 598px;">$a'$</div>
+<div style="left: 410px; top: 596px;">$a_1$</div>
+<div style="left: 496px; top: 596px;">$a_2$</div>
+<div style="left: 570px; top: 600px;">$...$</div>
+
+<pre style="left: 110px; top: 700px;">
+<b>Figure 7.</b>  An interaction net
+simulating the same behavior.
+</pre>
 </x-diagram>
 </x-slide>
 
@@ -1098,7 +1252,59 @@ We can then match an appropriate interaction rule and
 include direction info in the next state ($\color{ff0000} q_{\tg{L}}'$).
 </pre>
 
-<x-diagram> implementation with q0 coming from right {} </x-diagram>
+<x-diagram> implementation with q0 coming from right {}
+<svg width="590" height="680">
+    <use xlink:href="#g-inet-tm" />
+    <g stroke="black" stroke-width="2">
+        <polygon fill="#64c8dc" points="254,404, 346,404, 300,344" />
+        <polygon fill="#ff7c80" points="254,312, 346,312, 300,252" />
+
+        <path fill="none" d="M 300,26 Q 300,4 262,4" />
+        <path fill="none" d="M 262,4 C 150,4 312,156 226,156" />
+        <path fill="none" d="M 386,156 C 344,156 386,206 342,206" />
+        <path fill="none" d="M 342,206 Q 300,206 300,178" />
+
+        <path fill="none" d="M 300,252 Q 300,230 262,230" />
+        <path fill="none" d="M 262,230 C 150,230 312,382 226,382" />
+        <path fill="none" d="M 386,382 C 344,382 386,432 342,432" />
+        <path fill="none" d="M 342,432 Q 300,432 300,404" />
+    </g>
+</svg>
+
+<div style="left: 284px; top: 24px;">$q_R$</div>
+<div style="left: 16px; top: 134px;">$...$</div>
+<div style="left: 84px; top: 130px;">$a_{-2}$</div>
+<div style="left: 170px; top: 130px;">$a_{-1}$</div>
+<div style="left: 286px; top: 132px;">$a_0$</div>
+<div style="left: 410px; top: 130px;">$a_1$</div>
+<div style="left: 496px; top: 130px;">$a_2$</div>
+<div style="left: 570px; top: 134px;">$...$</div>
+<div style="left: 110px; top: 220px;">$\downarrow$</div>
+
+<div style="left: 286px; top: 264px;">$q_L'$</div>
+<div style="left: 16px; top: 360px;">$...$</div>
+<div style="left: 84px; top: 356px;">$a_{-2}$</div>
+<div style="left: 170px; top: 356px;">$a_{-1}$</div>
+<div style="left: 288px; top: 362px;">$a'$</div>
+<div style="left: 410px; top: 356px;">$a_1$</div>
+<div style="left: 496px; top: 356px;">$a_2$</div>
+<div style="left: 570px; top: 360px;">$...$</div>
+<div style="left: 110px; top: 450px; rotate: 90deg;">$=$</div>
+
+<div style="left: 194px; top: 492px;">$q_L'$</div>
+<div style="left: 16px; top: 600px;">$...$</div>
+<div style="left: 84px; top: 596px;">$a_{-2}$</div>
+<div style="left: 190px; top: 600px;">$a_{-1}$</div>
+<div style="left: 326px; top: 598px;">$a'$</div>
+<div style="left: 410px; top: 596px;">$a_1$</div>
+<div style="left: 496px; top: 596px;">$a_2$</div>
+<div style="left: 570px; top: 600px;">$...$</div>
+
+<pre style="left: 110px; top: 700px;">
+<b>Figure 8.</b>  The same transition,
+but with $\tr{q_0} \rightarrow \tr{q}_{\tg{R}}$ instead of $\tr{q}_{\tg{L}}$.
+</pre>
+</x-diagram>
 </x-slide>
 
 
@@ -1114,6 +1320,63 @@ and extend the tape.
 
 <x-diagram> a tape-extending reduction
 { x: 950, y: 130, w: 550, h: 520 }
+<svg width="550" height="520">
+    <rect fill="#e9dcc3" x="2" y="2" width="226" height="226"
+        rx="32" ry="32" />
+    <rect fill="#e9dcc3" x="2" y="296" width="226" height="226"
+        rx="32" ry="32" />
+
+    <g fill="#64c8dc" stroke="black" stroke-width="2">
+        <ellipse cx="166" cy="166" rx="36" ry="36" />
+        <polygon fill="#ff7c80" points="120,44, 212,44, 166,104" />
+        <polygon points="252,166, 312,120, 312,212" />
+        <polygon points="338,166, 398,120, 398,212" />
+        <polygon points="424,166, 484,120, 484,212" />
+        <polygon points="166,102, 166,130" />
+        <polygon points="312,166, 338,166" />
+        <polygon points="398,166, 424,166" />
+        <polygon points="484,166, 510,166" />
+        <path fill="none" d="M 166,44 Q 166,22 216,22" />
+        <path fill="none" d="M 216,22 C 310,22 150,166 252,166" />
+
+        <ellipse cx="60" cy="456" rx="36" ry="36" />
+        <polygon points="120,480, 212,480, 166,420" />
+        <polygon fill="#ff7c80" points="120,394, 212,394, 166,334" />
+        <polygon points="252,456, 312,410, 312,502" />
+        <polygon points="338,456, 398,410, 398,502" />
+        <polygon points="424,456, 484,410, 484,502" />
+        <polygon points="166,392, 166,420" />
+        <polygon points="312,456, 338,456" />
+        <polygon points="398,456, 424,456" />
+        <polygon points="484,456, 510,456" />
+        <path fill="none" d="M 96,456 C 126,456 96,506 128,506" />
+        <path fill="none" d="M 128,506 Q 166,506 166,480" />
+        <path fill="none" d="M 166,334 Q 166,312 216,312" />
+        <path fill="none" d="M 216,312 C 310,312 150,456 252,456" />
+    </g>
+</svg>
+
+<div style="left: 160px; top: 146px;">$b$</div>
+<div style="left: 152px; top: 42px;">$q_L$</div>
+<div style="left: 266px; top: 144px;">$a_{-2}$</div>
+<div style="left: 352px; top: 144px;">$a_{-1}$</div>
+<div style="left: 448px; top: 144px;">$a_0$</div>
+<div style="left: 522px; top: 144px;">$...$</div>
+
+<div style="left: 110px; top: 242px;">$\downarrow$</div>
+
+<div style="left: 54px; top: 436px;">$b$</div>
+<div style="left: 154px; top: 438px;">$a'$</div>
+<div style="left: 152px; top: 346px;">$q_R'$</div>
+<div style="left: 266px; top: 434px;">$a_{-2}$</div>
+<div style="left: 352px; top: 434px;">$a_{-1}$</div>
+<div style="left: 448px; top: 434px;">$a_0$</div>
+<div style="left: 522px; top: 434px;">$...$</div>
+
+<pre style="left: 30px; top: 550px;">
+<b>Figure 9.</b>  A tape extending reduction,
+with $\tg{\delta}(\tr{q}, \tb{b}) = (\tr{q'}, \tb{a'}, \tg{R})$.
+</pre>
 </x-diagram>
 </x-slide>
 
