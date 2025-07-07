@@ -401,13 +401,15 @@ computations per step.
 <x-diagram> interaction rules { x: 1030, y: 200, w: 346, h: 450 }
 <svg width="346" height="450">
     <g fill="#64c8dc" stroke="black" stroke-width="2">
-        <ellipse cx="60" cy="38" rx="36" ry="36" />
-        <polygon points="60,94, 112,154, 8,154" />
-        <polygon points="60,74, 60,94" />
-        <polygon points="36,154, 36,174" />
-        <polygon points="84,154, 84,174" />
-
-        <path fill="none" d="M 226,174 C 226,124 274,124 274,174" />
+        <g id="g-plus0">
+            <ellipse cx="60" cy="38" rx="36" ry="36" />
+            <polygon points="60,94, 112,154, 8,154" />
+            <polygon points="60,74, 60,94" />
+            <polygon points="36,154, 36,174" />
+            <polygon points="84,154, 84,174" />
+            <path fill="none"
+                d="M 226,174 C 226,124 274,124 274,174" />
+        </g>
 
         <polygon points="10,280, 102,280, 56,344" />
         <polygon points="56,364, 108,420, 4,420" />
@@ -425,8 +427,8 @@ computations per step.
     </g>
 </svg>
 <div style="left: 52px; top: 20px;">$0$</div>
-<div style="left: 48px; top: 106px;">$+$</div>
-<div style="left: 50px; top: 282px;">$s$</div>
+<div style="left: 48px; top: 108px;">$+$</div>
+<div style="left: 48px; top: 282px;">$s$</div>
 <div style="left: 44px; top: 376px;">$+$</div>
 <div style="left: 252px; top: 298px;">$+$</div>
 <div style="left: 288px; top: 366px;">$s$</div>
@@ -750,7 +752,85 @@ $4$ steps, with both rules being applied twice,
 possibly in only $2$ parallel reduction passes.
 </pre>
 
-<x-diagram> unary addition { x: 790, y: 120, w: 780, h: 710 }
+<x-diagram> unary addition { x: 780, y: 120, w: 780, h: 710 }
+<svg width="780" height="710">
+    <rect fill="#e9dcc3" x="2" y="2" width="340" height="260"
+        rx="32" ry="32" />
+    <rect fill="#e9dcc3" x="400" y="2" width="380" height="260"
+        rx="32" ry="32" />
+    <g fill="#64c8dc" stroke="black" stroke-width="2">
+        <use xlink:href="#g-plus0" x="26" y="30" />
+
+        <polygon points="430,60, 522,60, 476,124" />
+        <polygon points="476,144, 528,200, 424,200" />
+        <polygon points="476,124, 476,144" />
+        <polygon points="476,40, 476,60" />
+        <polygon points="452,200, 452,220" />
+        <polygon points="502,200, 502,220" />
+
+        <polygon points="684,60, 738,124, 630,124" />
+        <polygon points="672,144, 760,144, 716,204" />
+        <polygon points="684,40, 684,60" />
+        <polygon points="716,124, 716,144" />
+        <polygon points="716,204, 716,224" />
+        <polygon points="652,124, 652,224" />
+
+        <ellipse cx="106" cy="366" rx="36" ry="36" />
+        <ellipse cx="226" cy="366" rx="36" ry="36" />
+        <ellipse cx="346" cy="366" rx="36" ry="36" />
+        <polygon points="62,434, 150,434, 106,498" />
+        <polygon points="182,434, 270,434, 226,498" />
+        <polygon points="302,434, 390,434, 346,498" />
+        <polygon points="176,598, 226,534, 276,598" />
+        <polygon points="296,674, 346,608 396,674" />
+        <polygon points="106,402 106,434" />
+        <polygon points="226,402 226,434" />
+        <polygon points="346,402 346,434" />
+        <polygon points="226,498 226,534" />
+        <polygon points="346,498 346,608" />
+        <polygon points="372,674 372,694" />
+        <path fill="none" d="M 106,498 C 106,638 200,638 200,598" />
+        <path fill="none" d="M 252,598 C 252,714 320,714 320,674" />
+
+        <ellipse cx="614" cy="366" rx="36" ry="36" />
+        <polygon points="570,428, 658,428, 614,492" />
+        <polygon points="570,518, 658,518, 614,582" />
+        <polygon points="570,608, 658,608, 614,672" />
+        <polygon points="614,402, 614,428" />
+        <polygon points="614,492, 614,518" />
+        <polygon points="614,582 614,608" />
+        <polygon points="614,672, 614,698" />
+    </g>
+</svg>
+
+<div style="left: 78px; top: 50px;">$0$</div>
+<div style="left: 74px; top: 138px;">$+$</div>
+<div style="left: 54px; top: 202px;">
+    $x \quad y \qquad \qquad~ x \quad y$</div>
+<div style="left: 174px; top: 126px;">$\rightarrow$</div>
+<div style="left: 468px; top: 62px;">$s$</div>
+<div style="left: 464px; top: 156px;">$+$</div>
+<div style="left: 672px; top: 78px;">$+$</div>
+<div style="left: 708px; top: 146px;">$s$</div>
+<div style="left: 568px; top: 114px;">$\rightarrow$</div>
+
+<div style="left: 98px; top: 348px;">$0$</div>
+<div style="left: 218px; top: 348px;">$0$</div>
+<div style="left: 338px; top: 348px;">$0$</div>
+<div style="left: 98px; top: 438px;">$s$</div>
+<div style="left: 218px; top: 438px;">$s$</div>
+<div style="left: 338px; top: 438px;">$s$</div>
+<div style="left: 214px; top: 552px;">$+$</div>
+<div style="left: 334px; top: 628px;">$+$</div>
+<div style="left: 364px; top: 692px;">$x = 1 + 1 + 1$</div>
+
+<div style="left: 460px; top: 490px;">$\overset{*}{\rarr}$</div>
+
+<div style="left: 606px; top: 348px;">$0$</div>
+<div style="left: 606px; top: 432px;">$s$</div>
+<div style="left: 606px; top: 522px;">$s$</div>
+<div style="left: 606px; top: 612px;">$s$</div>
+<div style="left: 606px; top: 692px;">$x = 3$</div>
 </x-diagram>
 </x-slide>
 
