@@ -2141,14 +2141,123 @@ If we have a finite configuration (uniform state $\tb{p}$ past
 some first and last cell), we can use a similar technique
 as before to allow the finite net to expand indefinitely.
 
-We can instead represent periodic configurations by
-attaching both ends together, if the period is even.
+We can represent periodic configurations by attaching
+both ends together, if the period is even.
 </pre>
 
 <x-diagram> config expanding reduction
-{ x: 860, y: 190, w: 610, h: 400 }
+{ x: 860, y: 180, w: 610, h: 410 }
+<svg width="610" height="410">
+    <rect fill="#e9dcc3" x="110" y="152" width="270" height="108"
+        rx="16" ry="16" />
+    <rect fill="#e9dcc3" x="110" y="302" width="270" height="108"
+        rx="16" ry="16" />
+
+    <g fill="#64c8dc" stroke="black" stroke-width="2">
+        <ellipse cx="246" cy="56" rx="36" ry="36" />
+        <polygon points="308,10, 368,56, 308,102" />
+        <polygon points="394,56, 454,10, 454,102" />
+        <polygon points="480,10, 540,56, 480,102" />
+        <polyline points="282,56, 308,56" />
+        <polyline points="368,56, 394,56" />
+        <polyline points="454,56, 480,56" />
+        <polyline points="540,56, 566,56" />
+
+        <ellipse cx="246" cy="206" rx="36" ry="36" />
+        <polygon points="368,160, 308,206, 368,252" />
+        <polygon points="454,206, 394,160, 394,252" />
+        <polygon points="540,160, 480,206, 540,252" />
+        <polyline points="282,206, 308,206" />
+        <polyline points="368,206, 394,206" />
+        <polyline points="454,206, 480,206" />
+        <polyline points="540,206, 566,206" />
+
+        <ellipse cx="160" cy="356" rx="36" ry="36" />
+        <polygon points="222,356, 282,310, 282,402" />
+        <polygon points="308,310, 368,356, 308,402" />
+        <polygon points="394,356, 454,310, 454,402" />
+        <polygon points="480,310, 540,356, 480,402" />
+        <polyline points="196,356, 222,356" />
+        <polyline points="282,356, 308,356" />
+        <polyline points="368,356, 394,356" />
+        <polyline points="454,356, 480,356" />
+        <polyline points="540,356, 566,356" />
+    </g>
+</svg>
+
+<div style="left: -8px; top: 34px;">
+    $(... \quad~~ p \qquad p)$</div>
+<div style="left: 240px; top: 34px;">$p$</div>
+<div style="left: 320px; top: 34px;">$r$</div>
+<div style="left: 424px; top: 34px;">$\overline{s}$</div>
+<div style="left: 494px; top: 34px;">$t$</div>
+<div style="left: 580px; top: 32px;">$...$</div>
+
+<div style="left: 328px; top: 104px;">$\Downarrow$</div>
+
+<div style="left: 240px; top: 184px;">$p$</div>
+<div style="left: 332px; top: 184px;">$\overline{rs}$</div>
+<div style="left: 404px; top: 184px;">$rs$</div>
+<div style="left: 506px; top: 184px;">$\overline{tu}$</div>
+<div style="left: 580px; top: 182px;">$...$</div>
+
+<div style="left: 328px; top: 262px;">$\Downarrow$</div>
+
+<div style="left: -8px; top: 334px;">
+    $(... \quad~ p')$</div>
+<div style="left: 150px; top: 334px;">$p'$</div>
+<div style="left: 254px; top: 334px;">$\overline{q}$</div>
+<div style="left: 320px; top: 334px;">$r$</div>
+<div style="left: 424px; top: 334px;">$\overline{s}$</div>
+<div style="left: 494px; top: 334px;">$t$</div>
+<div style="left: 580px; top: 332px;">$...$</div>
+
+<pre style="left: -10px; top: 430px;">
+<b>Figure 14.</b>  A configuration-expanding parallel
+reduction sequence, with $\tg{f}(\tb{p}, \tb{p}, \tb{p}) = \tb{p'}$.
+
+If $\tg{f}(\tb{p}, \tb{p}, \tb{r}) = \tb{p}$, then it does not need to expand.
+If also $\tg{f}(\tb{p}, \tb{r}, \tb{s}) = \tb{p}$, we can contract the net instead.
+</pre>
 </x-diagram>
-<x-diagram> periodic reduction { x: 240, y: 620, w: 400, h: 260 }
+
+<x-diagram> periodic reduction { x: 240, y: 600, w: 400, h: 270 }
+<svg width="400" height="270">
+    <g fill="#64c8dc" stroke="black" stroke-width="2">
+        <polygon points="42,76, 102,30, 102,122" />
+        <polygon points="128,30, 188,76, 128,122" />
+        <polygon points="214,76, 274,30, 274,122" />
+        <polygon points="300,30, 360,76, 300,122" />
+        <polyline points="102,76, 128,76" />
+        <polyline points="188,76, 214,76" />
+        <polyline points="274,76, 300,76" />
+        <path fill="none" d="M 42,76 C 2,76 2,8 200,8" />
+        <path fill="none" d="M 200,8 C 400,8 400,76 360,76" />
+
+        <polygon points="102,196, 42,150, 42,242" />
+        <polygon points="188,150, 128,196, 188,242" />
+        <polygon points="274,196, 214,150, 214,242" />
+        <polygon points="360,150, 300,196, 360,242" />
+        <polyline points="102,196, 128,196" />
+        <polyline points="188,196, 214,196" />
+        <polyline points="274,196, 300,196" />
+        <path fill="none" d="M 42,196 C 2,196 2,264 102,264" />
+        <path fill="none" d="M 300,264 C 400,264 400,196 360,196" />
+        <polyline points="102,264, 300,264" />
+    </g>
+</svg>
+
+<div style="left: 74px; top: 54px;">$\overline{q}$</div>
+<div style="left: 140px; top: 54px;">$r$</div>
+<div style="left: 244px; top: 54px;">$\overline{s}$</div>
+<div style="left: 314px; top: 54px;">$t$</div>
+
+<div style="left: 190px; top: 100px;">$\Downarrow$</div>
+
+<div style="left: 50px; top: 174px;">$tq$</div>
+<div style="left: 152px; top: 174px;">$\overline{rs}$</div>
+<div style="left: 222px; top: 174px;">$rs$</div>
+<div style="left: 328px; top: 174px;">$\overline{tq}$</div>
 </x-diagram>
 </x-slide>
 
